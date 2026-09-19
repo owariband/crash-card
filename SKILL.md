@@ -56,11 +56,12 @@ Default to 1080×1350 px, 4:5 portrait PNG, with a light background, high contra
 
 After confirmation:
 
-1. Create a manifest that follows [references/card-schema.md](references/card-schema.md). Keep raw user prose out of the rendered card unless it is explicitly requested.
-2. Run `python3 scripts/validate_manifest.py path/to/manifest.json`.
-3. Run `python3 scripts/render_cards.py path/to/manifest.json --output-dir path/to/output`. The renderer writes SVG source beside each PNG so the result remains inspectable and editable. On macOS it uses the local Swift/AppKit rasterizer and never downloads a renderer.
-4. Run `python3 scripts/validate_outputs.py path/to/output --manifest path/to/manifest.json`.
-5. Deliver the PNGs, `intro.md`, and `manifest.json`. Mention any cards that could only be emitted as SVG because a local raster converter was unavailable.
+1. Read [references/runtime.md](references/runtime.md) and run `python3 scripts/check_environment.py`. This workflow uses Python's standard library and the local macOS Swift/AppKit rasterizer; do not install PyYAML or image packages for ordinary use.
+2. Create a manifest that follows [references/card-schema.md](references/card-schema.md). Keep raw user prose out of the rendered card unless it is explicitly requested.
+3. Run `python3 scripts/validate_manifest.py path/to/manifest.json`.
+4. Run `python3 scripts/render_cards.py path/to/manifest.json --output-dir path/to/output`. The renderer writes SVG source beside each PNG so the result remains inspectable and editable. On macOS it uses the local Swift/AppKit rasterizer and never downloads a renderer.
+5. Run `python3 scripts/validate_outputs.py path/to/output --manifest path/to/manifest.json`.
+6. Deliver the PNGs, `intro.md`, and `manifest.json`. Mention any cards that could only be emitted as SVG because a local raster converter was unavailable.
 
 The scripts are deterministic helpers. Do not automatically install Python, Node, browser, fonts, or third-party packages. If Swift/AppKit is missing, report the exact command that failed and retain the inspectable SVG; the PNG render is then incomplete and must not be presented as finished.
 
