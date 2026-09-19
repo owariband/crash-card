@@ -9,12 +9,14 @@ from __future__ import annotations
 
 import argparse
 import html
+import importlib.util
 import json
 import os
 import re
 import shutil
 import subprocess
 import sys
+import platform
 from pathlib import Path
 
 
@@ -127,6 +129,8 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("manifest", type=Path)
     parser.add_argument("--output-dir", required=True, type=Path)
+    parser.add_argument("--renderer", choices=("auto", "swift", "pillow", "svg"), default="auto")
+    parser.add_argument("--font-path", help="CJK font path for the Pillow adapter")
     args = parser.parse_args()
     manifest_path = args.manifest.resolve()
     output_dir = args.output_dir.resolve()
@@ -142,12 +146,33 @@ def main() -> int:
         folder.mkdir(parents=True, exist_ok=True)
         (folder / f"{card_id}.svg").write_text(make_svg(card, width, height, theme), encoding="utf-8")
 
-    swift = shutil.which("swift")
-    if not swift:
-        print("Swift is unavailable; SVG sources were written, but PNG rendering cannot run on this machine.", file=sys.stderr)
-        return 2
-    rasterizer = Path(__file__).with_name("render_cards.swift")
-    result = subprocess.run([swift, str(rasterizer), str(manifest_path), str(output_dir)], text=True)
+    if args.renderer == "svg":
+        print(f"SVG sources written to {output_dir}; PNG rendering was not requested.")
+        return 0
+
+    selected = args.renderer
+    if selected == "auto":
+        if platform.system() == "Darwin" and shutil.which("swift"):
+            selected = "swift"
+        elif importlib.util.find_spec("PIL") is not None:
+            selected = "pillow"
+        else:
+            print("No local PNG renderer is available; SVG sources were written. Install Pillow on Windows/Linux or use Swift/AppKit on macOS.", file=sys.stderr)
+            return 2
+
+    if selected == "swift":
+        swift = shutil.which("swift")
+        if not swift:
+            print("Swift is unavailable; SVG sources were written, but PNG rendering cannot run on this machine.", file=sys.stderr)
+            return 2
+        rasterizer = Path(__file__).with_name("render_cards.swift")
+        result = subprocess.run([swift, str(rasterizer), str(manifest_path), str(output_dir)], text=True)
+    else:
+        rasterizer = Path(__file__).with_name("render_cards_pillow.py")
+        command = [sys.executable, str(rasterizer), str(manifest_path), str(output_dir)]
+        if args.font_path:
+            command.extend(["--font", args.font_path])
+        result = subprocess.run(command, text=True)
     return result.returncode
 
 
