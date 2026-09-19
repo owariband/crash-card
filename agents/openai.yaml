@@ -1,0 +1,4 @@
+interface:
+  display_name: "Crash Flashcard"
+  short_description: "秋招知识点速记卡片生成与 PNG 渲染"
+  default_prompt: "用 crash-flashcard 把这段秋招知识整理成速记卡片，先给我草稿，确认后再渲染 PNG。"
