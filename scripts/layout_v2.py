@@ -438,7 +438,7 @@ def plan_card(card, fonts, theme):
             raise LayoutError(f"{card['id']} / {block['id']}: content ends at {math.ceil(y + used)}px (limit 1450px); revise layout or split this complete sub-question")
         y += used + t["block_gap"]
     scene.line([(x, 1492), (x + width, 1492)], t["rule"], 2)
-    footer = "用自己的话解释 · 答后核对" if card["type"] == "self_check" else "CRASH FLASHCARD"
+    footer = "用自己的话解释 · 答后核对" if card["type"] == "self_check" else "CRASH CARD"
     if card["type"] == "answer" and card.get("explanation_ids"):
         footer = "补学：" + " / ".join(card["explanation_ids"])
         if fonts.width(footer, 26) > width - 260:
