@@ -1,6 +1,6 @@
 # Runtime requirements
 
-The card workflow has platform adapters with a small, explicit dependency set.
+The card workflow has platform adapters with a small, explicit dependency set. Resolve `SKILL_ROOT` and `OUTPUT_DIR` as described in SKILL.md; all paths below use those absolute directories, regardless of the current working directory.
 
 On macOS:
 
@@ -10,8 +10,8 @@ On macOS:
 On Windows or Linux:
 
 - Python 3.9 or newer.
-- Pillow 10 or newer: `python -m pip install -r requirements-renderer.txt` (or `python -m pip install "Pillow>=10"`).
-- A CJK-capable font. The adapter searches common Noto Sans CJK, Microsoft YaHei, and macOS font paths; use `render_cards_pillow.py --font /path/to/font.ttf` when the font is elsewhere.
+- Pillow 10 or newer: `python -m pip install -r "$SKILL_ROOT/requirements-renderer.txt"` (or `python -m pip install "Pillow>=10"`).
+- A CJK-capable font. The adapter searches common Noto Sans CJK, Microsoft YaHei, and macOS font paths; use the main renderer’s `--font-path /path/to/font.ttf` option when the font is elsewhere.
 
 Not required at runtime on macOS:
 
@@ -19,4 +19,4 @@ Not required at runtime on macOS:
 - CairoSVG, Playwright, Chromium, Node.js, npm, ImageMagick, and `sips`.
 - Any network access, package installation, or third-party Skill.
 
-Run `python3 scripts/check_environment.py` before rendering. `render_cards.py` selects Swift/AppKit on macOS and Pillow elsewhere. You can override this with `--renderer swift|pillow|svg`; `--font-path` or `CRASH_FLASHCARD_FONT` supplies a font to Pillow. If the selected adapter or a CJK font is unavailable, the renderer can still write SVG inspection sources, but PNG delivery is incomplete. Do not present SVG-only output as finished when the user requested PNG.
+Run `python3 "$SKILL_ROOT/scripts/check_environment.py"` before rendering. `render_cards.py` selects Swift/AppKit on macOS and Pillow elsewhere. You can override this with `--renderer swift|pillow|svg`; `--font-path` or `CRASH_FLASHCARD_FONT` supplies a font to Pillow. If the selected adapter or a CJK font is unavailable, the renderer can still write SVG inspection sources, but PNG delivery is incomplete. Do not present SVG-only output as finished when the user requested PNG.

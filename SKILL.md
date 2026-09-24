@@ -1,70 +1,91 @@
 ---
 name: crash-flashcard
-description: Create concise Chinese autumn-recruiting knowledge flashcards from a user's requirements and self-explanation. Identify and correct the knowledge first, present a reviewable draft, and render confirmed content as separate quick-check or explanation PNG cards with a short social caption.
+description: 面向一般知识主题的深入速成：从简短主题、普通文本（含对话）或用户自述中提取核心知识点，核对纠错并生成中文速记卡。适用于知识梳理、制卡、讲解带练与复习自检，提供费曼式题目卡、讲解卡和独立答案。
 metadata:
-  short-description: 秋招知识点速记卡片生成与 PNG 渲染
+  short-description: 一般知识主题深入速成、费曼自检与速记卡
 ---
 
 # Crash Flashcard
 
-This skill turns a short content request or a long spoken explanation into a compact, reviewable set of Chinese study cards. The workflow is stateful:
+围绕一般知识主题深入速成，把用户关注的核心知识转成准确、可复习、可核对的中文卡片。以费曼式“自己解释 → 暴露缺口 → 补学 → 再解释”为学习骨架，结合主动回忆、例题示范、反馈和间隔复习。教会与制卡分别记录完成情况。
+
+默认流程：
 
 `RECEIVE → PARSE → KNOWLEDGE_CHECK → DRAFT → WAIT_CONFIRM → RENDER → VALIDATE → DELIVER`
 
-## Operating rules
+## 1. 识别请求，选择工作模式
 
-1. Parse two inputs separately when both are present:
-   - `request`: what the user wants included and how concise it should be.
-   - `attempt`: the user's current explanation or understanding.
-2. When `attempt` is a long oral explanation, identify the underlying knowledge point before drafting. Give a concrete judgement for each claim: `正确`, `部分正确`, `错误`, or `无法判断`. Explain the correction briefly and write a corrected baseline. Do not silently rewrite a misconception.
-3. Produce a text draft first. The draft must contain the knowledge baseline, card plan, proposed short caption, and any assumptions. Stop and wait for an explicit confirmation such as `确认`, `生成`, `开始制作`, or an equivalent instruction. A request to revise the draft returns to `DRAFT`.
-4. Render only after confirmation. Never infer confirmation from a request that merely asks for a draft or asks what the cards might look like.
-5. Keep the two card modes separate. A single PNG has exactly one `type`; batches are written to separate `quick-check/` and `explanation/` directories. Do not put a fill-in exercise and a teaching explanation on the same card.
-6. Use the user's requested facts as the source of truth for scope. If a technical claim is uncertain, label it and ask for a source or leave it as `无法判断`; do not invent statistics, citations, or interview experience.
-7. Keep each card information-dense but scannable. Prefer short lines, tables, and simple relationship diagrams only when they make the knowledge easier to recall. Do not add decoration that competes with the content.
+支持简短主题、普通文本和用户自述。对话按普通文本处理：结合用户要求抓取关注的核心知识点、疑问和学习重点，忽略闲聊与重复内容，无需逐轮分析发言者或还原对话。
 
-## Draft format
+分开提取 `request`（目标、范围、用途、精简程度、输出形式）、材料中的核心知识点，以及用户明确作为自己理解提供的 `attempt`。材料中的观点用于知识核对，不直接作为用户掌握程度的证据。只有简短主题时直接整理必要知识，不要求补写自述。信息足够就开始；只有缺少主题或无法判断所指材料时，问一个必要问题。
 
-Use this structure in the response:
+- **制卡，默认**：直接核对知识、补齐必要内容并给草稿。没有自述时写“未提供自述，掌握情况未检验”，不强迫用户先接受一轮教学或答题。
+- **讲解带练**：用户要学懂、讲透或帮助纠错时，读取 [references/workflow.md](references/workflow.md) 的“带练循环”，每次一个核心难点、一个待答任务。用户已有长自述时直接利用，不再重复诊断。
+- **复习自检**：用户要考一考时，从闭卷题开始，答后核对；一次一道。先不展示答案、讲解卡或速记总结，除非用户要求。
+
+用户一次性要完整材料时，用分区或文件交付，不强制多轮问答。制卡草稿确认与学习自检是不同环节：确认制作不代表知识已经掌握。
+
+## 2. 核对知识，补齐本次范围
+
+读取 [references/workflow.md](references/workflow.md) 的“知识核对与覆盖”，核对核心知识与自述中的主张，建立本次知识基线和覆盖记录。较大主题拆成相连单元，保留原始请求与剩余范围。
+
+用户要求决定内容范围；事实正确性依据材料和可靠来源判断。涉及具体技术版本、数据库实现等差异时写明假设，必要时核查官方文档。无法确认的关键事实不能进入肯定式答案卡；先查证，仍不确定则清楚列为未闭环项，必要时只就缺失材料提问。只有用户同意缩小范围，才能将该部分移出本次交付。
+
+“讲透”指本次范围的必要前提、机制、应用与已暴露误解有交代，并能指出对应卡片或核对点；不是保证不存在任何未知。单凭看过讲解或草稿确认，不标记“已经掌握”。
+
+## 3. 设计卡片与可审核草稿
+
+制作 manifest 前读取 [references/card-schema.md](references/card-schema.md)。沿用现有两种卡片类型和渲染器，不创建新的 JSON 类型：
+
+- `quick_check`：主动回忆题卡。优先“用自己的话解释、为什么、换情境、纠错／反例”等费曼式开放题；精确术语、顺序和映射可用填空。`blanks` 可以是简短中性作答栏，`answer_key` 按栏保存答案。题干和标题不能泄露被考查的关键答案。
+- `explanation`：讲解卡，按需呈现定义、核心关系、步骤、完整例子或边界。把一个知识点讲透可以需要多张相连卡片，不能只为塞进一张而省去关键条件。
+
+每张 PNG 只承担一个主要任务，只有一个 `type`；两类图片分别放入 `quick-check/` 和 `explanation/`，题目与其答案不拼在同一张图上。题量与选题依据见 workflow 的“交付与复习包”。
+
+信息密度靠删除废话和重复获得。用短行、少量重点、必要的关系表；术语首次出现有白话说明，条件紧邻结论，例子展示关键过程。避免装饰争夺注意力。默认 1080×1350、4:5 竖版、浅底高对比、充足边距；尊重用户指定尺寸。
+
+草稿使用下列结构，可合并短项：
 
 ```text
+【本次范围】学习／复习目标；必要前置；范围外拓展（如有）
 【识别的知识点】...
-【对原述的判断】
-- 原述：...
-  判断：正确 / 部分正确 / 错误 / 无法判断
-  说明：...
-【纠正后的知识基线】...
+【对原述的判断】原述短引文 → 判断 → 修正与理由（无自述则省略）
+【纠正后的知识基线】定义、机制、例子、边界
 【卡片草稿】
-- quick_check/001: 标题；题干；填空数；答案（仅草稿展示）
-- explanation/001: 标题；定义；核心关系；例子或易错点
-【简介文案草稿】...
-【待确认假设】...
+- quick-check/qc-001：标题；题干；作答栏；对应答案与核对点
+- explanation/ex-001：标题；定义；核心关系；例子／边界
+【覆盖检查】问题／知识点 → 讲解卡 ID → 自检卡 ID；未覆盖项如实列出
+【简介文案草稿】简短、具体，不添加卡片之外的事实
+【待核验／待确认假设】没有则省略
 ```
 
-If the user only supplies a concise topic request, omit the oral-explanation judgement section and state that no self-explanation was provided.
+这是制作审核稿，可以展示答案并标明“审核稿含答案”；用户要求纯自检或先不看答案时，先交题目，不套含答案草稿。
 
-## Card modes
+完整草稿交付后等待明确的 `确认 / 生成 / 开始制作` 或同等指令再渲染。已确认的内容且用户已授权生成，直接继续，不重复索要确认；修改内容则更新草稿。用户更明确的制作指令优先，不把此流程变成额外审批。
 
-Read [references/card-schema.md](references/card-schema.md) before building the manifest.
+## 4. 渲染、核对与学习交付
 
-- `quick_check`: a self-test card. Show a question, short prompt, and one or more blanks. Keep answers in the manifest's `answer_key`; never leak them into the rendered card. Use for definitions, contrasts, mappings, and interview recall.
-- `explanation`: a compact teaching card. Use a definition, core relation, example, and/or common mistake. Use a table or a simple bar/flow diagram only when it improves recall.
+按上节取得制作授权后执行。先确定本次读取的 `SKILL.md` 所在目录的绝对路径为 `SKILL_ROOT`。读取 [references/output-storage.md](references/output-storage.md)，首次制卡时询问并持久保存根目录，以后直接使用；本次指定的位置仅覆盖本次设置。每批在所选根目录下新建独立子文件夹，将其绝对路径设为 `OUTPUT_DIR`。
 
-Default to 1080×1350 px, 4:5 portrait PNG, with a light background, high contrast text, generous margins, and a small footer label. Respect an explicit platform or dimension request.
+脚本、依赖清单和资源始终从 `SKILL_ROOT` 定位，不依赖终端当前目录。下列命令中的变量需替换或设置为实际绝对路径，并保留引号。
 
-## Rendering workflow
+1. 读取 [references/runtime.md](references/runtime.md)，运行 `python3 "$SKILL_ROOT/scripts/check_environment.py"`。macOS 用 Swift/AppKit；Windows/Linux 用 Pillow。保持既有依赖策略，不因学习方法增加软件包。
+2. 在 `OUTPUT_DIR` 下生成符合 schema 的 `manifest.json`，默认不把原始长篇口述直接画上卡片。
+3. 运行 `python3 "$SKILL_ROOT/scripts/validate_manifest.py" "$OUTPUT_DIR/manifest.json"`。
+4. 运行 `python3 "$SKILL_ROOT/scripts/render_cards.py" "$OUTPUT_DIR/manifest.json" --output-dir "$OUTPUT_DIR"`。可用 `--renderer swift|pillow|svg`、`--font-path` 指定已可用的适配器或字体；保留旁侧 SVG。
+5. 运行 `python3 "$SKILL_ROOT/scripts/validate_outputs.py" "$OUTPUT_DIR" --manifest "$OUTPUT_DIR/manifest.json"`，并逐张查看 PNG，核对遗漏、裁切、错字、关键条件、答案泄露和可读性。脚本通过不代表视觉或知识检查通过；当前渲染器有截行限制，超长时拆卡、更新 manifest 后重渲染。
+6. 按 [references/workflow.md](references/workflow.md) 的“交付与复习包”在 `OUTPUT_DIR` 下编写 `answer-key.md`、`review.md` 和 `intro.md`；这些 Markdown 文件由 agent 生成，不由渲染器自动产出。
+7. 交付分组 PNG、`intro.md`、`manifest.json`、`answer-key.md`、`review.md`。提醒 manifest 和答案文件含明文答案，快速自检先看题目组，答后再打开讲解和答案。简介是本地交付文案，不自动发布。
 
-After confirmation:
+脚本是确定性辅助工具，不自动安装 Python、字体或无关依赖。Windows/Linux 若预检缺 Pillow，按 runtime 的明确安装方式处理；缺适配器或 CJK 字体时报告具体失败命令并保留 SVG。PNG 请求的 SVG-only 结果必须标为未完成。
 
-1. Read [references/runtime.md](references/runtime.md) and run `python3 scripts/check_environment.py`. The renderer selects Swift/AppKit on macOS and Pillow on Windows/Linux; do not install PyYAML or unrelated image packages. On Windows/Linux, install Pillow explicitly if the preflight reports it missing.
-2. Create a manifest that follows [references/card-schema.md](references/card-schema.md). Keep raw user prose out of the rendered card unless it is explicitly requested.
-3. Run `python3 scripts/validate_manifest.py path/to/manifest.json`.
-4. Run `python3 scripts/render_cards.py path/to/manifest.json --output-dir path/to/output`. The renderer writes SVG source beside each PNG so the result remains inspectable and editable. It selects Swift/AppKit on macOS and Pillow elsewhere. Use `--renderer swift|pillow|svg` to override auto-selection and `--font-path /path/to/font.ttf` to provide a CJK font to Pillow.
-5. Run `python3 scripts/validate_outputs.py path/to/output --manifest path/to/manifest.json`.
-6. Deliver the PNGs, `intro.md`, and `manifest.json`. Mention any cards that could only be emitted as SVG because a local raster converter was unavailable.
+## 5. 完成判定
 
-The scripts are deterministic helpers. Do not automatically install Python, fonts, or third-party packages. On macOS the renderer uses Swift/AppKit; on Windows/Linux it uses Pillow. If the selected adapter or a CJK font is missing, report the exact command that failed and retain the inspectable SVG; the PNG render is then incomplete and must not be presented as finished.
+- **内容**：原始请求已覆盖，显式疑问与必要前置有交代，已知核心事实错误已修正；无法确认的内容如实标注，不能包装成正确答案。
+- **制卡**：用户已确认或明确授权制作；manifest 与输出校验通过；每张 PNG 的尺寸、文本完整性和题答分离经检查；简介与主题相符。
+- **核对**：每道自检题均有独立答案、理由和可核对要点，ID 与作答栏一一对应；复习文件与图片使用同一知识基线。
+- **学习**：仅按实际回答记录 `已讲待检 / 待修补 / 有支持完成 / 当场独立通过 / 延迟通过`。制卡完成可以成立而学习仍待检验，不能把它们混为一个状态。
 
-## Completion criteria
+用户只要文本草稿、讲解或自检时，按该请求收尾，不强行渲染 PNG。用户中途暂停就交续学定位，不新增当前必须回答的问题。
 
-The task is complete only when the draft was explicitly confirmed, every manifest card passed schema checks, each rendered card has the requested dimensions and a non-empty file, quick-check answers are absent from card text, explanation cards contain no unresolved placeholders, and the caption matches the requested topics.
+需要解释学习方法或修改教学规则时，读取 [references/learning-evidence.md](references/learning-evidence.md)。具体题量、时长与篇幅只是可调默认值；证据支持多个组成方法，不意味着整套 Skill 已经获得 ADHD 专属效果验证。

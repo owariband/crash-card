@@ -1,4 +1,4 @@
 interface:
   display_name: "Crash Flashcard"
-  short_description: "秋招知识点速记卡片生成与 PNG 渲染"
-  default_prompt: "用 crash-flashcard 把这段秋招知识整理成速记卡片，先给我草稿，确认后再渲染 PNG。"
+  short_description: "一般知识主题深入速成，生成 ADHD 友好的费曼自检卡、讲解卡与独立答案"
+  default_prompt: "用 $crash-flashcard 从我给出的主题或文本中提取核心知识点，核对并补齐机制和边界，先给题目卡、讲解卡与独立答案的草稿，确认后再渲染 PNG。"
