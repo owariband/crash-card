@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate PNG outputs against a crash-flashcard manifest."""
+"""Validate PNG outputs against a crash-card manifest."""
 
 from __future__ import annotations
 

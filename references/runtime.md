@@ -19,4 +19,4 @@ Not required at runtime on macOS:
 - CairoSVG, Playwright, Chromium, Node.js, npm, ImageMagick, and `sips`.
 - Any network access, package installation, or third-party Skill.
 
-Run `python3 "$SKILL_ROOT/scripts/check_environment.py"` before rendering. `render_cards.py` selects Swift/AppKit on macOS and Pillow elsewhere. You can override this with `--renderer swift|pillow|svg`; `--font-path` or `CRASH_FLASHCARD_FONT` supplies a font to Pillow. If the selected adapter or a CJK font is unavailable, the renderer can still write SVG inspection sources, but PNG delivery is incomplete. Do not present SVG-only output as finished when the user requested PNG.
+Run `python3 "$SKILL_ROOT/scripts/check_environment.py"` before rendering. `render_cards.py` selects Swift/AppKit on macOS and Pillow elsewhere. You can override this with `--renderer swift|pillow|svg`; `--font-path` or `CRASH_CARD_FONT` supplies a font to Pillow. If the selected adapter or a CJK font is unavailable, the renderer can still write SVG inspection sources, but PNG delivery is incomplete. Do not present SVG-only output as finished when the user requested PNG.

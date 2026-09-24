@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate the small JSON manifest consumed by crash-flashcard."""
+"""Validate the small JSON manifest consumed by crash-card."""
 
 from __future__ import annotations
 

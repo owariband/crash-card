@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check the local runtime needed for crash-flashcard PNG rendering."""
+"""Check the local runtime needed for crash-card PNG rendering."""
 
 from __future__ import annotations
 
