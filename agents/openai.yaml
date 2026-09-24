@@ -1,4 +1,4 @@
 interface:
   display_name: "Crash Card"
-  short_description: "一般知识主题深入速成，生成 ADHD 友好的费曼自检卡、讲解卡与独立答案"
-  default_prompt: "用 $crash-card 从我给出的主题或文本中提取核心知识点，核对并补齐机制和边界，先给题目卡、讲解卡与独立答案的草稿，确认后再渲染 PNG。"
+  short_description: "准确讲解知识，生成费曼自查与解答 PNG，并按语义核对口述"
+  default_prompt: "用 $crash-card 将这个主题制作成 1200×1600 的讲解、自查和解答 PNG 卡片，按知识结构选版式，保留必要前提、推理和例子，并支持我口述后逐项核对。"

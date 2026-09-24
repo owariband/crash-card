@@ -63,7 +63,7 @@ def font_candidates() -> list[Path]:
 
 
 def load_font(size: int, path: str | None, bold: bool = False):
-    configured = path or os.environ.get("CRASH_CARD_FONT")
+    configured = path or os.environ.get("CRASH_CARD_FONT") or os.environ.get("CRASH_FLASHCARD_FONT")
     choices = [Path(configured)] if configured else font_candidates()
     for candidate in choices:
         if candidate.is_file():

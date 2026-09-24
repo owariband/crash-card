@@ -1,2 +1,2 @@
-# Optional: install this file only when using the Pillow adapter on Windows/Linux.
-Pillow>=10
+# Compatibility entry point for existing installation commands.
+-r requirements.txt

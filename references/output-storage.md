@@ -25,6 +25,8 @@
 
 创建目录时要求目录尚不存在；同名则追加 `-02`、`-03` 等编号再尝试，避免覆盖已有批次。把成功创建目录的绝对路径作为 `OUTPUT_DIR`。输出根目录和批次目录均放在 skill 安装目录之外。
 
-本批次的 `manifest.json`、`intro.md`、`answer-key.md`、`review.md`、`quick-check/` 和 `explanation/` 全部放入该目录。最终交付给出可点击的批次目录链接。
+本批次的 `manifest.json`、`transcript.md`、`answer-key.md`、`oral-rubric.json`、`review.md`、`sources.md`、`render-report.json`，以及 `explanation/`、`self-check/`、`answer/` 三组 PNG 全部放入该目录。需要简介文案时由 agent 另写 `intro.md`，同样放入该批次目录。最终交付给出可点击的批次目录链接。
 
-新主题或新一批制卡创建新目录。明确修改或重渲染同一批卡片时沿用该批次目录；读取原 manifest 识别旧产物，移除本次已取消卡片对应的旧 PNG/SVG，保留用户其他文件，再执行输出校验。无法确定原批次位置时先定位原产物或询问，不把任意已有目录当作当前批次。
+新主题或新一批制卡创建新目录。明确修改或重渲染同一批 v2 卡片时沿用该批次目录；保留原 `render-report.json`，由渲染器在成功出图后根据旧报告和 PNG 哈希清理已取消的卡片。预先不删除旧图；未知或被修改的旧图交由用户选择保留位置，不擅自清理。保留 `intro.md`、`learning-log.md` 和其他用户文件；`review.md` 会重新导出，真实作答记录按 workflow 存入 `learning-log.md`。无法确定原批次位置时先定位原产物或询问，不把任意已有目录当作当前批次。
+
+旧 manifest 继续使用 legacy 路径和原批次的 `quick-check/`、`explanation/`；升级到 v2 时，在同一所选根目录下新建批次，保留旧批次，避免新旧图混放。

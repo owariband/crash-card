@@ -1,42 +1,38 @@
 #!/usr/bin/env python3
-"""Check the local runtime needed for crash-card PNG rendering."""
-
-from __future__ import annotations
-
-import platform
-import shutil
-import subprocess
+"""Check the actual v2 Chinese text, formula, matrix, and PNG runtime."""
+import argparse
+import importlib.metadata
 import sys
-import importlib.util
 
 
-def main() -> int:
-    problems: list[str] = []
-    if sys.version_info < (3, 9):
-        problems.append(f"Python 3.9+ is required (found {platform.python_version()})")
-    swift = shutil.which("swift")
-    if platform.system() == "Darwin" and swift is None:
-        problems.append("the `swift` command is missing; install macOS Xcode Command Line Tools")
-    if platform.system() != "Darwin" and importlib.util.find_spec("PIL") is None:
-        problems.append("Pillow is missing; install it with `python -m pip install 'Pillow>=10'`")
-    if problems:
-        print("environment incomplete:", file=sys.stderr)
-        for problem in problems:
-            print(f"- {problem}", file=sys.stderr)
-        print("SVG source output remains possible, but PNG rendering is unavailable.", file=sys.stderr)
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--font-path')
+    parser.add_argument('--font-bold-path')
+    args = parser.parse_args()
+    try:
+        from layout_v2 import Fonts, formula_image, Scene
+        import io
+        from PIL import Image
+        fonts = Fonts(args.font_path, args.font_bold_path)
+        fonts.width('概念、前提、机制与边界 → √2', 48)
+        formula = formula_image(r'\frac{QK^{T}}{\sqrt{d_k}}', 60, '#172B40')
+        if not formula.width or not formula.height:
+            raise ValueError('empty formula output')
+        buffer = io.BytesIO()
+        formula.save(buffer, 'PNG')
+        Image.open(io.BytesIO(buffer.getvalue())).load()
+        print('v2 environment ready: Python ' + sys.version.split()[0])
+        print(', '.join(name + ' ' + importlib.metadata.version(name) for name in ['Pillow', 'matplotlib', 'fonttools']))
+        print('CJK regular: ' + fonts.regular)
+        print('CJK bold: ' + fonts.bold)
+        print('Chinese glyphs, fraction, radical, superscript/subscript and PNG decoding passed.')
+        return 0
+    except Exception as exc:
+        print('environment incomplete: ' + str(exc), file=sys.stderr)
+        print('Use a virtual environment with the skill requirements.txt and a local CJK font.', file=sys.stderr)
         return 2
-    if platform.system() == "Darwin":
-        try:
-            version = subprocess.run([swift, "--version"], check=True, capture_output=True, text=True).stdout.splitlines()[0]
-        except (OSError, subprocess.CalledProcessError, IndexError) as exc:
-            print(f"environment incomplete: Swift exists but could not be queried: {exc}", file=sys.stderr)
-            return 2
-        print(f"environment ready: Python {platform.python_version()}, {version}")
-        print("adapter: Swift/AppKit; runtime Python packages: standard library only")
-    else:
-        print(f"environment ready: Python {platform.python_version()}")
-        print("adapter: Pillow; runtime package: Pillow")
-    return 0
 
-if __name__ == "__main__":
+
+if __name__ == '__main__':
     raise SystemExit(main())
