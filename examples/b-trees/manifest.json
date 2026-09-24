@@ -1,278 +1,554 @@
 {
   "schema_version": 2,
-  "title": "B 树与 B+ 树：从结构到范围查询",
+  "title": "B 树与 B+ 树",
   "dimensions": {
     "width": 1200,
     "height": 1600
   },
   "units": [
     {
-      "id": "u-range",
-      "title": "B 树与 B+ 树",
-      "objective": "区分两种树的数据位置，并根据 B+ 树的路由规则与叶层链接解释范围查询的起点、结果和停止条件。",
-      "scope": "教材中的经典 B 树与带有序叶层链接的 B+ 树；键为互异整数，区间含两端。示意树根分隔键为 30、50，相等时走右侧分支。不讨论插入删除、并发控制或特定数据库实现。",
+      "id": "my-structure",
+      "title": "结构与页访问",
+      "objective": "比较B树和B+树的载荷位置，并从页容量和范围访问解释InnoDB普通索引适用B+结构的原因。",
+      "scope": "MySQL 8.4 / InnoDB普通BTREE索引，对照教科书B/B+树；讨论结构适用性，不声称还原设计者的历史动机。",
       "prerequisites": [
-        "知道键是用于查找和排序的值。",
-        "知道根、内部节点与叶子节点的区别。"
+        "索引键用于查找；记录载荷是索引实际关联的数据或记录引用。",
+        "页是数据库缓存和存储管理的基本单位之一。"
       ],
       "source_ids": [
-        "opendsa",
-        "cmu"
+        "M1",
+        "M2",
+        "M3",
+        "M4",
+        "M5",
+        "M6"
+      ]
+    },
+    {
+      "id": "my-range",
+      "title": "追踪范围扫描",
+      "objective": "从根定位范围下界，再沿叶链说明扫描、跨页及停止条件。",
+      "scope": "假定优化器选择age二级索引，只追踪20≤age<30的键扫描；暂不展开聚簇取行与MVCC可见性检查。",
+      "prerequisites": [
+        "已知B+树内部节点用于路由、记录位于叶层。",
+        "叶页以索引顺序相连。"
+      ],
+      "source_ids": [
+        "M2",
+        "M6",
+        "M7"
+      ]
+    },
+    {
+      "id": "my-performance",
+      "title": "性能结论的边界",
+      "objective": "纠正B+树点查总更快及树高等于磁盘I/O的过度概括。",
+      "scope": "结构推理与定性反例；没有运行负载测试，不给固定树高、I/O次数或速度倍数。",
+      "prerequisites": [
+        "理解B树允许内部命中，B+树需到叶层。",
+        "缓冲池缓存表页和索引页。"
+      ],
+      "source_ids": [
+        "M2",
+        "M3",
+        "M4",
+        "M5",
+        "M7"
       ]
     }
   ],
   "sources": [
     {
-      "id": "opendsa",
-      "title": "Virginia Tech OpenDSA — B-Trees / B+ Trees",
-      "url": "https://opendsa-server.cs.vt.edu/ODSA/Books/CS3/html/BTree.html",
-      "note": "依据：经典 B 树的查找、B+ 树内部节点与叶子的分工、有序叶层与范围扫描。示例数值和题目为本项目原创。"
+      "id": "M1",
+      "title": "MySQL 8.4 — Glossary / B-tree",
+      "url": "https://dev.mysql.com/doc/refman/8.4/en/glossary.html",
+      "note": "官方B-tree术语是一类索引设计的泛称。"
     },
     {
-      "id": "cmu",
-      "title": "CMU 15-445/645, Fall 2024 — Lecture 08: Indexes & Filters I",
+      "id": "M2",
+      "title": "CMU 15-445/645 (2024) — Indexes & Filters I",
       "url": "https://15445.courses.cs.cmu.edu/fall2024/notes/08-indexes1.pdf",
-      "note": "依据：第 1–2 页的平衡性质、B 树与 B+ 树数据位置区别、内部节点路由以及叶子存记录或记录定位信息。"
+      "note": "B/B+载荷位置、同深叶层、叶链、分裂和维护成本。"
+    },
+    {
+      "id": "M3",
+      "title": "Dave Mount (2019) — B Trees",
+      "url": "https://www.cs.umd.edu/class/fall2019/cmsc420-0201/Lects/slides-09-btree.pdf",
+      "note": "B树内部命中后结束；B+紧凑内部条目与范围访问。"
+    },
+    {
+      "id": "M4",
+      "title": "MySQL 8.4 — Physical Structure of an InnoDB Index",
+      "url": "https://dev.mysql.com/doc/refman/8.4/en/innodb-physical-structure.html",
+      "note": "索引页、默认16KB、叶记录、分裂和合并；普通索引范围。"
+    },
+    {
+      "id": "M5",
+      "title": "MySQL 8.4 — Buffer Pool",
+      "url": "https://dev.mysql.com/doc/refman/8.4/en/innodb-buffer-pool.html",
+      "note": "索引页可在缓冲池命中，树高不等于磁盘读取次数。"
+    },
+    {
+      "id": "M6",
+      "title": "MySQL mysql-8.4.0 — btr0btr.cc",
+      "url": "https://github.com/mysql/mysql-server/blob/mysql-8.4.0/storage/innobase/btr/btr0btr.cc",
+      "note": "Node pointers说明内部键前缀与子页号；叶页链接及物理连续的条件性。"
+    },
+    {
+      "id": "M7",
+      "title": "MySQL 8.4 — Clustered and Secondary Indexes",
+      "url": "https://dev.mysql.com/doc/refman/8.4/en/innodb-index-types.html",
+      "note": "聚簇叶记录与二级记录包含聚簇键；非覆盖查询可能需聚簇访问。"
     }
   ],
   "questions": [
     {
-      "id": "q-range",
-      "unit_id": "u-range",
-      "title": "换个区间，你会怎么查？",
-      "prompt": "查询 22 ≤ k ≤ 55：从根开始，说明访问哪些叶子、返回哪些键，以及在哪里停止、为什么。",
+      "id": "my-q-01",
+      "unit_id": "my-structure",
+      "title": "把结构与适用性串起来",
+      "prompt": "向同事解释：B树与B+树怎样安排内部节点和记录载荷？这种差异为什么适合InnoDB的页式存储和范围查询？同时说明你的性能比较需要什么前提。",
       "explanation_ids": [
-        "ex-structure",
-        "ex-range"
-      ],
-      "context": [
-        {
-          "id": "given-tree",
-          "kind": "flow",
-          "nodes": [
-            {
-              "id": "root",
-              "label": "根：30 | 50"
-            },
-            {
-              "id": "p1",
-              "label": "P1",
-              "text": "10, 20"
-            },
-            {
-              "id": "p2",
-              "label": "P2",
-              "text": "30, 40"
-            },
-            {
-              "id": "p3",
-              "label": "P3",
-              "text": "50, 60"
-            }
-          ],
-          "edges": [
-            {
-              "from": "root",
-              "to": "p1",
-              "label": "<30"
-            },
-            {
-              "from": "root",
-              "to": "p2",
-              "label": "30–49"
-            },
-            {
-              "from": "root",
-              "to": "p3",
-              "label": "≥50"
-            }
-          ]
-        },
-        {
-          "id": "given-links",
-          "kind": "paragraph",
-          "text": "键为互异整数；有序叶层：P1 → P2 → P3。箭头表示相邻叶子的链接，区间含两端。"
-        }
+        "my-ex-01",
+        "my-ex-02"
       ],
       "solution": {
         "blocks": [
           {
-            "id": "result",
-            "kind": "callout",
-            "heading": "结果：30、40、50",
-            "text": "访问路径：根 → P1 → P2 → P3。"
+            "id": "structure",
+            "kind": "paragraph",
+            "text": "B树内部节点也可带记录载荷；B+树内部主要存分隔键和子页指针，记录集中在有序叶层。B树同样能做范围查询。",
+            "heading": "核心差异"
           },
           {
-            "id": "reason",
+            "id": "cause",
             "kind": "paragraph",
-            "heading": "为什么这样走",
-            "text": "22 < 30，先到 P1；10、20 都小于下界。沿叶层到 P2，返回 30、40，再到 P3 返回 50。遇到 60 > 55 就停止：后续键更大，也不符合区间。"
+            "text": "相同页预算、相近键宽等条件下，紧凑内部条目有利于提高扇出、减少层数；叶链使范围查询定位起点后能继续扫描。",
+            "heading": "为什么适合"
           },
           {
             "id": "boundary",
             "kind": "paragraph",
-            "heading": "结构起了什么作用",
-            "text": "根只负责路由；定位后利用叶层的有序链接继续扫描，无需为每个结果重新从根查找。"
+            "text": "这解释了结构适用性，不能推出任何查询都更快。缓存、实际树高与扫描量仍会影响耗时。",
+            "heading": "结论的条件"
           }
         ],
         "criteria": [
           {
-            "id": "start",
-            "text": "说明先到 P1，再沿叶层向后查。",
+            "id": "c1",
+            "text": "讲清载荷位置与叶链。",
             "required": true
           },
           {
-            "id": "result-stop",
-            "text": "结果为 30、40、50；用有序性解释停止。",
+            "id": "c2",
+            "text": "连上紧凑条目→扇出→页路径的因果。",
+            "required": true
+          },
+          {
+            "id": "c3",
+            "text": "保留比较条件，不断言所有查询更快。",
             "required": true
           }
         ],
         "critical_errors": [
-          "认为下界 22 不存在就没有结果。",
-          "直接把内部节点的分隔键当作返回记录。"
+          "说B树的叶子不在同一深度。",
+          "说B树无法范围查询。",
+          "说每下降一层都必然读取一次磁盘。",
+          "说所有MySQL索引都是B+树。"
         ],
         "accepted_variants": [
-          "可用箭头、逐步口述或等价的伪代码表达，不要求照抄答案。"
+          "可以用“路由条目更小，一页容纳更多分支”解释扇出。",
+          "不要求背16KB；该数值不是本题核心判断标准。"
+        ]
+      }
+    },
+    {
+      "id": "my-q-02",
+      "unit_id": "my-range",
+      "title": "跨页与停止条件",
+      "prompt": "从首次定位开始，解释这次扫描如何前进。就题面记录说明哪些符合范围、何时停止，以及是否需要逐条从根重查。",
+      "explanation_ids": [
+        "my-ex-03"
+      ],
+      "solution": {
+        "blocks": [
+          {
+            "id": "path",
+            "kind": "paragraph",
+            "text": "先从根按分隔键定位首个age≥20的位置，再按索引顺序扫描。本页读完后沿叶链访问后继页，不必为每条记录重走根路径。",
+            "heading": "定位与跨页"
+          },
+          {
+            "id": "stop",
+            "kind": "paragraph",
+            "text": "题面给出的两条24和27都符合范围；遇到30停止，因为上界不含30，后面的31也不符合。这只是所示片段，不是完整结果集。",
+            "heading": "本例结果"
+          },
+          {
+            "id": "limits",
+            "kind": "paragraph",
+            "text": "重复age可对应不同记录，不能只保留一个24。叶链是逻辑顺序，不能据此断定磁盘页连续。",
+            "heading": "必要边界"
+          }
+        ],
+        "criteria": [
+          {
+            "id": "c1",
+            "text": "先定位下界，再沿叶链扫描。",
+            "required": true
+          },
+          {
+            "id": "c2",
+            "text": "保留两个24与27，到30停止。",
+            "required": true
+          },
+          {
+            "id": "c3",
+            "text": "不逐条从根重查，也不假定物理连续。",
+            "required": true
+          }
+        ],
+        "critical_errors": [
+          "把上界30也收进结果。",
+          "把相同age误判为同一条记录而去重。",
+          "认为叶链扫描不需要任何页访问。"
+        ],
+        "accepted_variants": [
+          "可以说“定位起点后顺序走叶子”，但需说明跨页靠叶链接。",
+          "“扫描到第一条不满足上界就结束”与“遇30停止”等价。"
+        ]
+      },
+      "context": [
+        {
+          "id": "given",
+          "kind": "paragraph",
+          "text": "假定采用 age 二级索引查询 20≤age<30，不去重；只追踪索引键，不展开取行与事务可见性。"
+        },
+        {
+          "id": "pages",
+          "kind": "table",
+          "headers": [
+            "位置",
+            "题面给出的 age"
+          ],
+          "rows": [
+            [
+              "当前叶页末条",
+              "24"
+            ],
+            [
+              "后继叶页",
+              "24、27、30、31"
+            ]
+          ],
+          "widths": [
+            0.43,
+            0.57
+          ]
+        }
+      ]
+    },
+    {
+      "id": "my-q-03",
+      "unit_id": "my-performance",
+      "title": "辨认过度概括",
+      "prompt": "同事说：“B+树所有记录都在叶子，所以点查一定比B树快；它有3层，每次查询就要读3次磁盘。”请分别判断两条推论，用反例或条件修正，再给出一句准确的性能表述。",
+      "explanation_ids": [
+        "my-ex-04"
+      ],
+      "solution": {
+        "blocks": [
+          {
+            "id": "point",
+            "kind": "paragraph",
+            "text": "第一条不成立：B树可在内部命中，B+树需到叶层。仅凭载荷位置，不能断言点查更快。",
+            "heading": "点查推论"
+          },
+          {
+            "id": "io",
+            "kind": "paragraph",
+            "text": "第二条不成立：页可在缓冲池命中，无需读盘。二级索引若需回表，还会增加聚簇索引路径。",
+            "heading": "I/O推论"
+          },
+          {
+            "id": "rewrite",
+            "kind": "paragraph",
+            "text": "B+结构利于高扇出与范围扫描；耗时取决于树高、缓存及查询路径，需实测。写入也有页分裂等成本。",
+            "heading": "准确改写"
+          }
+        ],
+        "criteria": [
+          {
+            "id": "c1",
+            "text": "给出B树内部命中的点查反例。",
+            "required": true
+          },
+          {
+            "id": "c2",
+            "text": "区分访问页与物理磁盘读。",
+            "required": true
+          },
+          {
+            "id": "c3",
+            "text": "性能表述保留缓存及查询路径条件。",
+            "required": true
+          }
+        ],
+        "critical_errors": [
+          "认为叶子同深就代表所有查询耗时相同。",
+          "认为缓存命中仍必然读磁盘。",
+          "反向改成B树点查一定更快。"
+        ],
+        "accepted_variants": [
+          "可说“逻辑页访问与物理I/O不同”。",
+          "只要条件明确且方向正确，不要求使用原答案措辞。"
         ]
       }
     }
   ],
   "cards": [
     {
-      "id": "ex-structure",
+      "id": "my-ex-01",
       "type": "explanation",
-      "unit_id": "u-range",
+      "unit_id": "my-structure",
+      "title": "B树与B+树，差在哪里？",
       "layout": "comparison",
-      "title": "B 树与 B+ 树",
+      "depth": "core",
       "blocks": [
         {
           "id": "shared",
           "kind": "paragraph",
-          "text": "两者都是平衡多路搜索树：一个节点可有多个分支，所有叶子处在同一层。"
+          "text": "两者都是有序、平衡的多路树，叶子同深；多路指内部节点可有多个子节点。载荷指记录或记录引用。"
         },
         {
           "id": "compare",
           "kind": "table",
           "headers": [
-            "对比",
-            "经典 B 树",
-            "B+ 树"
-          ],
-          "widths": [
-            2,
-            3.5,
-            3.5
+            "维度",
+            "B树",
+            "B+树"
           ],
           "rows": [
             [
-              "数据位置",
-              "内部节点和叶子都可保存数据",
-              "数据集中在叶子，内部节点负责路由"
+              "载荷位置",
+              "内部与叶节点都可保存",
+              "集中在叶节点"
             ],
             [
-              "查找终点",
-              "可在内部节点找到数据",
-              "沿分支找到叶子，再取数据"
+              "查找结束",
+              "可能在内部节点命中",
+              "沿路径到叶节点"
+            ],
+            [
+              "范围遍历",
+              "定位后按键序遍历所需范围",
+              "定位后沿叶链扫描"
             ]
+          ],
+          "widths": [
+            0.23,
+            0.385,
+            0.385
           ]
         },
         {
-          "id": "leaf-meaning",
+          "id": "meaning",
+          "kind": "callout",
+          "text": "B+树内部主要保存分隔键和子节点指针。InnoDB普通索引采用这类结构；手册中的“B-tree”常是泛称。",
+          "tone": "key"
+        }
+      ],
+      "page": {
+        "index": 1,
+        "total": 2
+      }
+    },
+    {
+      "id": "my-ex-02",
+      "type": "explanation",
+      "unit_id": "my-structure",
+      "title": "结构优势怎样变成访问优势？",
+      "layout": "concept",
+      "depth": "core",
+      "blocks": [
+        {
+          "id": "fanout",
           "kind": "paragraph",
-          "text": "这里的“数据”可以是记录本身，也可以是记录的位置；叶子不一定存整行。"
+          "text": "页大小、键长等条件相近时，内部条目不放记录载荷，一页能容纳更多子页指针；节点分支数称为扇出。",
+          "heading": "内部页更能分路"
         },
         {
-          "id": "range-difference",
+          "id": "height",
+          "kind": "paragraph",
+          "text": "扇出较大，同量记录通常可用更少层覆盖；查询到叶子经过的页更少，有助于降低访问成本。InnoDB默认页大小16KB，可在初始化时配置。",
+          "heading": "扇出影响树高"
+        },
+        {
+          "id": "range",
+          "kind": "paragraph",
+          "text": "叶层索引记录按键序排列，叶页之间有链接。定位范围起点后可沿叶链扫描，不必为每条记录重走根路径。",
+          "heading": "范围扫描易延续"
+        },
+        {
+          "id": "limit",
           "kind": "callout",
-          "text": "B+ 树通常把叶子有序链接，方便范围扫描。B 树也能做范围查询。"
+          "text": "优势取决于键宽、页占用和负载。相关页可能已缓存，树的层数不等于磁盘读取次数。",
+          "tone": "caution"
         }
+      ],
+      "page": {
+        "index": 2,
+        "total": 2
+      }
+    },
+    {
+      "id": "my-sc-01",
+      "type": "self_check",
+      "unit_id": "my-structure",
+      "question_id": "my-q-01",
+      "title": "说明选择背后的因果",
+      "layout": "question"
+    },
+    {
+      "id": "my-an-01",
+      "type": "answer",
+      "unit_id": "my-structure",
+      "question_id": "my-q-01",
+      "title": "核对：结构如何影响访问",
+      "layout": "answer",
+      "solution_refs": [
+        "structure",
+        "cause",
+        "boundary",
+        "@criteria"
       ]
     },
     {
-      "id": "ex-range",
+      "id": "my-ex-03",
       "type": "explanation",
-      "unit_id": "u-range",
-      "layout": "worked_example",
-      "title": "范围查询怎样走？",
+      "unit_id": "my-range",
+      "title": "范围查询如何沿叶链前进？",
+      "layout": "process",
+      "depth": "core",
       "blocks": [
         {
-          "id": "tree",
+          "id": "context",
+          "kind": "paragraph",
+          "text": "假定采用age二级索引查找20≤age<30。下面只追踪索引键，暂不展开取行与事务可见性检查。"
+        },
+        {
+          "id": "scan",
           "kind": "flow",
           "nodes": [
             {
-              "id": "root",
-              "label": "根：30 | 50"
+              "id": "locate",
+              "label": "定位范围起点",
+              "text": "从根按分隔键下降，找到首个age≥20的位置。"
             },
             {
-              "id": "p1",
-              "label": "P1",
-              "text": "10, 20"
+              "id": "scan_page",
+              "label": "按序扫描，必要时跨页",
+              "text": "本页读完且未结束，就沿叶链继续。相同age的记录逐条处理。"
             },
             {
-              "id": "p2",
-              "label": "P2",
-              "text": "30, 40"
-            },
-            {
-              "id": "p3",
-              "label": "P3",
-              "text": "50, 60"
+              "id": "stop",
+              "label": "遇上界或末尾即停止",
+              "text": "仅保留age<30；遇到age≥30或索引末尾便结束。"
             }
           ],
           "edges": [
             {
-              "from": "root",
-              "to": "p1",
-              "label": "<30"
+              "from": "locate",
+              "to": "scan_page"
             },
             {
-              "from": "root",
-              "to": "p2",
-              "label": "30–49"
-            },
-            {
-              "from": "root",
-              "to": "p3",
-              "label": "≥50"
+              "from": "scan_page",
+              "to": "stop"
             }
           ]
         },
         {
-          "id": "links",
-          "kind": "paragraph",
-          "text": "键为互异整数；有序叶层：P1 → P2 → P3。叶子间箭头表示相邻链接。"
-        },
-        {
-          "id": "trace",
-          "kind": "paragraph",
-          "heading": "查询 15 ≤ k ≤ 45",
-          "text": "先按下界 15 从根到 P1，跳过 10，返回 20；沿叶层到 P2，返回 30、40；再到 P3，遇到 50 > 45 停止。"
-        },
-        {
-          "id": "mechanism",
+          "id": "boundary",
           "kind": "callout",
-          "text": "先定位下界，再沿有序叶层扫描；第一个超过上界的键就是停止信号。"
+          "text": "叶链按键序相邻，不保证磁盘页物理连续。",
+          "tone": "caution"
         }
       ]
     },
     {
-      "id": "sc-range",
+      "id": "my-sc-02",
       "type": "self_check",
-      "unit_id": "u-range",
-      "layout": "question",
-      "question_id": "q-range"
+      "unit_id": "my-range",
+      "question_id": "my-q-02",
+      "title": "追踪一次跨页范围查询",
+      "layout": "question"
     },
     {
-      "id": "an-range",
+      "id": "my-an-02",
       "type": "answer",
-      "unit_id": "u-range",
+      "unit_id": "my-range",
+      "question_id": "my-q-02",
+      "title": "核对：起点、延续与终点",
       "layout": "answer",
-      "title": "从下界走到停止条件",
-      "question_id": "q-range",
       "solution_refs": [
-        "result",
-        "reason",
-        "boundary",
+        "path",
+        "stop",
+        "limits",
+        "@criteria"
+      ]
+    },
+    {
+      "id": "my-ex-04",
+      "type": "explanation",
+      "unit_id": "my-performance",
+      "title": "B+树一定比B树快吗？",
+      "layout": "misconception",
+      "depth": "core",
+      "blocks": [
+        {
+          "id": "verdict",
+          "kind": "paragraph",
+          "text": "不能仅凭树的名称判定快慢。B+树通常适合范围扫描和页式存储，但一次查询的成本由访问路径与运行条件共同决定。",
+          "heading": "准确结论"
+        },
+        {
+          "id": "point",
+          "kind": "paragraph",
+          "text": "B树某个键可在内部节点命中并结束；B+树通常需到叶子。若相关页都在内存，磁盘读取的差异也可能消失。",
+          "heading": "点查并无绝对胜负"
+        },
+        {
+          "id": "cost",
+          "kind": "paragraph",
+          "text": "还要看实际层数、缓存命中、范围大小、是否需访问聚簇索引。写入时，页分裂与维护也有成本。",
+          "heading": "还需考虑什么"
+        },
+        {
+          "id": "rewrite",
+          "kind": "callout",
+          "text": "可说“在合适的页容量与查询模式下，B+结构有利于较高扇出和范围扫描”；性能结论仍需执行计划与实测支持。",
+          "tone": "key"
+        }
+      ]
+    },
+    {
+      "id": "my-sc-03",
+      "type": "self_check",
+      "unit_id": "my-performance",
+      "question_id": "my-q-03",
+      "title": "两句话，各错在哪里？",
+      "layout": "question"
+    },
+    {
+      "id": "my-an-03",
+      "type": "answer",
+      "unit_id": "my-performance",
+      "question_id": "my-q-03",
+      "title": "核对：性能判断的证据",
+      "layout": "answer",
+      "solution_refs": [
+        "point",
+        "io",
+        "rewrite",
         "@criteria"
       ]
     }

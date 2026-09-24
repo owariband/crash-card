@@ -1,0 +1,65 @@
+[
+  {
+    "post": "01-结构与访问优势",
+    "file": "posts/01-结构与访问优势/01-结构对比.png",
+    "card_id": "my-ex-01",
+    "master": "explanation/my-ex-01.png",
+    "sha256": "f8628139ee758e1327fb4ffe0779b93d07fb6243b69565ba32eeac85daa73f9f"
+  },
+  {
+    "post": "01-结构与访问优势",
+    "file": "posts/01-结构与访问优势/02-访问优势与条件.png",
+    "card_id": "my-ex-02",
+    "master": "explanation/my-ex-02.png",
+    "sha256": "1b605ee71983f3474f73e93c270de4b6376796758a8418531aec7fea6f5c9e6b"
+  },
+  {
+    "post": "02-结构自测与解答",
+    "file": "posts/02-结构自测与解答/01-结构自测.png",
+    "card_id": "my-sc-01",
+    "master": "self-check/my-sc-01.png",
+    "sha256": "e1d3a23852213fe2cd64ad3e5f4613639243f0796b46180d00f4f7aec38a57f9"
+  },
+  {
+    "post": "02-结构自测与解答",
+    "file": "posts/02-结构自测与解答/02-结构解答.png",
+    "card_id": "my-an-01",
+    "master": "answer/my-an-01.png",
+    "sha256": "c14e15113a14077749b81171300f03fbe30ab6095c85fbe4ab8cb8f0e07bb007"
+  },
+  {
+    "post": "03-范围扫描讲解",
+    "file": "posts/03-范围扫描讲解/01-范围扫描流程.png",
+    "card_id": "my-ex-03",
+    "master": "explanation/my-ex-03.png",
+    "sha256": "fe5e8388dbaa66c41b32a880139443b03621b5ad18549cf54f4ed22f51a94afd"
+  },
+  {
+    "post": "04-跨页扫描自测与解答",
+    "file": "posts/04-跨页扫描自测与解答/01-跨页自测.png",
+    "card_id": "my-sc-02",
+    "master": "self-check/my-sc-02.png",
+    "sha256": "821e87a3f00c5b66de32822c5b1a48d5017aa4a6567b1872b9adbc8440942c59"
+  },
+  {
+    "post": "04-跨页扫描自测与解答",
+    "file": "posts/04-跨页扫描自测与解答/02-跨页解答.png",
+    "card_id": "my-an-02",
+    "master": "answer/my-an-02.png",
+    "sha256": "d5eda28feb687625ebea119126b05b9ac0af925003d8bca571c659f96c5b7cf9"
+  },
+  {
+    "post": "05-性能误区辨析",
+    "file": "posts/05-性能误区辨析/01-性能辨错.png",
+    "card_id": "my-sc-03",
+    "master": "self-check/my-sc-03.png",
+    "sha256": "05dc39e3515175cab31ea08d7a5466b891cc13602911b54a8d1c7df61d602e64"
+  },
+  {
+    "post": "05-性能误区辨析",
+    "file": "posts/05-性能误区辨析/02-性能解答.png",
+    "card_id": "my-an-03",
+    "master": "answer/my-an-03.png",
+    "sha256": "5a5e440f27cd27d6856b4e276e9a5eeec6bb4e4b92168c6e84d6c694920be308"
+  }
+]

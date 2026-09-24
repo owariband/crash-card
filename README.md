@@ -27,47 +27,61 @@ Crash Card 是一个中文学习 Skill：把知识主题、笔记、文章或口
 
 ## 效果演示：B 树与 B+ 树
 
-下面是项目渲染器生成的 **4 张真实卡片**，演示一个小目标：理解两种树的数据位置，并走通 B+ 树的范围查询。图片均可点击查看原图；对应数据与完整导出见 [examples/b-trees](examples/b-trees)。
+下面是项目渲染器生成的 **10 张学习卡**，围绕结构差异、InnoDB 页访问、范围扫描和性能误区组织为三个知识单元；另整理成 **5 期、9 张社媒图片**。图片可点击查看原图，完整数据和导出见 [examples/b-trees](examples/b-trees)。
 
-### 1. 先理解：结构对比 + 具体过程
+### 1. 先理解：结构如何影响访问
 
-| B 树与 B+ 树的结构差异 | 在示意树上查询 `15 ≤ k ≤ 45` |
+| B 树与 B+ 树的结构差异 | 从页容量到访问优势 |
 | :---: | :---: |
-| [![B 树与 B+ 树结构对比讲解卡](examples/b-trees/explanation/ex-structure.png)](examples/b-trees/explanation/ex-structure.png) | [![B+ 树范围查询过程讲解卡](examples/b-trees/explanation/ex-range.png)](examples/b-trees/explanation/ex-range.png) |
+| [![结构对比讲解卡](examples/b-trees/explanation/my-ex-01.png)](examples/b-trees/explanation/my-ex-01.png) | [![访问优势与条件讲解卡](examples/b-trees/explanation/my-ex-02.png)](examples/b-trees/explanation/my-ex-02.png) |
 
-示例限定为经典教材结构、互异整数键和包含两端的区间；叶子间有有序链接。关键知识依据 [OpenDSA 的 B-Trees 教材](https://opendsa-server.cs.vt.edu/ODSA/Books/CS3/html/BTree.html)与 [CMU 15-445/645 课程讲义](https://15445.courses.cs.cmu.edu/fall2024/notes/08-indexes1.pdf)，数值和题目为本项目编写。
+示例对照教科书 B/B+ 树与 **MySQL 8.4 InnoDB 普通 BTREE 索引**，保留页大小、键宽、缓存和查询路径等条件，不将结构特点直接等同于任何查询都更快。依据包括 [CMU 课程讲义](https://15445.courses.cs.cmu.edu/fall2024/notes/08-indexes1.pdf)、[MySQL 索引物理结构](https://dev.mysql.com/doc/refman/8.4/en/innodb-physical-structure.html)和[缓冲池文档](https://dev.mysql.com/doc/refman/8.4/en/innodb-buffer-pool.html)；完整依据见 [sources.md](examples/b-trees/sources.md)。
 
-### 2. 再自查：换一个区间，自己走一遍
+### 2. 再自查：追踪一次跨页扫描
 
-查询改成 `22 ≤ k ≤ 55`。先说明从根到哪些叶子、返回哪些键、在哪里停止以及原因，再展开解答。
+假定采用 age 二级索引查询 `20≤age<30`，不去重，只追踪索引键。当前叶页末条是 24，后继页依次是 24、27、30、31。说明首次定位、跨页过程、符合条件的记录与停止位置。
 
-<a href="examples/b-trees/self-check/sc-range.png"><img src="examples/b-trees/self-check/sc-range.png" alt="B+ 树范围查询自查卡：查询 22 到 55" width="480"></a>
+<a href="examples/b-trees/self-check/my-sc-02.png"><img src="examples/b-trees/self-check/my-sc-02.png" alt="跨页范围扫描自查卡" width="480"></a>
 
 <details>
 <summary><strong>3. 答完再展开：参考解答与核对标准</strong></summary>
 
-<a href="examples/b-trees/answer/an-range.png"><img src="examples/b-trees/answer/an-range.png" alt="B+ 树范围查询解答卡，含路径、结果、停止条件与核对点" width="480"></a>
+<a href="examples/b-trees/answer/my-an-02.png"><img src="examples/b-trees/answer/my-an-02.png" alt="跨页范围扫描解答与核对点" width="480"></a>
 
-结果是 **30、40、50**。从根先到 P1，跳过小于 22 的键，再沿叶层到 P2、P3；遇到 60 大于 55 时停止。关键是解释「下界定位 → 叶层扫描 → 利用有序性停止」，只列结果还不足以检查过程是否理解。
+先从根定位首个 age≥20 的位置，再按索引顺序扫描，跨页时沿叶链继续。题面片段中的两条 24 和 27 都符合条件；遇到 30 停止，因为上界不含 30。片段不是完整结果集，重复 age 也不代表同一条记录。
 
 </details>
 
 ### 4. 按缺口补学，再检验一次
 
-例如下面这段**模拟回答**：
+例如这段**模拟回答**：
 
-> 「22 不在树里，所以没有结果。」
+> 「两个 24 一样，只保留一个；30 也算在范围里。」
 
-核对时会指出：这里把范围查询当成了精确匹配。回看 `ex-range`，解释如何找到第一个不小于下界的键，然后换成 `35 ≤ k ≤ 50` 再走一次。
+核对时会指出两个缺口：题目没有去重要求；小于 30 不包含 30。回看[范围扫描讲解](examples/b-trees/explanation/my-ex-03.png)，再将条件改为 `24≤age≤30`，说明题面片段里应保留哪些记录。
 
 <details>
 <summary>变式题参考答案</summary>
 
-从根到 P2，跳过 30，返回 40；沿叶层到 P3，返回 50；遇到 60 超过上界后停止。结果为 **40、50**，注意上界 50 也包含在结果内。
+题面片段保留两条 24、27 和 30；遇到 31 超过上界后停止。这里只报告给定片段，不能据此列出完整结果集。
 
 </details>
 
 这是交互流程示意，不是任何学习者的真实评分。看过答案后的复述与独立答对会分别记录；没有实际作答时，状态保持「未检验」。
+
+### 5. 按期导出社交媒体素材
+
+| 期次 | 内容 | 图片数 |
+| --- | --- | ---: |
+| [01](examples/b-trees/posts/01-结构与访问优势) | 结构对比与访问优势 | 2 |
+| [02](examples/b-trees/posts/02-结构自测与解答) | 结构自测与解答 | 2 |
+| [03](examples/b-trees/posts/03-范围扫描讲解) | 范围扫描流程 | 1 |
+| [04](examples/b-trees/posts/04-跨页扫描自测与解答) | 跨页自测与解答 | 2 |
+| [05](examples/b-trees/posts/05-性能误区辨析) | 性能辨错与解答 | 2 |
+
+每期一个文件夹，PNG 按上传顺序命名，`post.md` 保存配文及来源。讲解与练习是否拆期由内容决定：性能误区用一期题答完成，母版中的补充讲解保留作复习，不重复放入发布包。以上都是本地素材，没有自动发布到平台。
+
+这次示例使用 **苹方简体 Regular / Semibold**，字体文件不随仓库分发；这不改变渲染器的默认字体选择。单张页码留空，连续两张讲解显示 `1/2`、`2/2`，卡面不显示内部 ID 或图片尺寸。
 
 ## 安装
 
@@ -240,7 +254,9 @@ OUTPUT_DIR="$(mktemp -d "${TMPDIR:-/tmp}/crash-card-demo.XXXXXX")"
   "$OUTPUT_DIR" --manifest "$OUTPUT_DIR/manifest.json"
 ```
 
-如果你是在开发目录中克隆本仓库，将 `SKILL_ROOT` 改为仓库绝对路径。以上命令生成 **4 张 1200 × 1600 PNG** 和全部配套文件；字体不同可能带来排版或像素差异。修改内容后应重新渲染、校验并查看实际图片。
+如果你是在开发目录中克隆本仓库，将 `SKILL_ROOT` 改为仓库绝对路径。以上命令生成 **10 张 1200 × 1600 PNG** 和全部配套文件；字体不同可能带来排版或像素差异。要使用指定字体，将同一组 `--font-path` 与 `--font-bold-path` 参数传给环境预检和渲染命令；TTC 目前只读取第一个 face，示例使用的是本机提取的简体字形。修改内容后应重新渲染、校验并查看实际图片。
+
+这些命令生成学习母版；`posts/` 由 Agent 按社交发布规则另行整理，渲染脚本不会自动生成分期文案。仓库的 [publication-map.json](examples/b-trees/publication-map.json) 记录 9 张发布图片与母版的对应关系和哈希。
 
 自定义卡片从 [manifest 格式](references/card-schema.md)与 [设计规则](references/design.md)开始。环境预检和输出校验不会替代事实核验；公式使用 mathtext 子集，流程图支持有限分支的无环图。旧版 manifest 的兼容与迁移见 [运行说明](references/runtime.md)。
 

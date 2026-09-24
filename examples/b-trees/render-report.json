@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "manifest_sha256": "ec545dad5318e31322ad6e1a816aadb0f97e2ac22041084b1d51cd18e0c8bed0",
+  "manifest_sha256": "325dd364bee353016584a65230019f5d809ce83301fc9efd768477184652cb91",
   "dimensions": {
     "width": 1200,
     "height": 1600
@@ -8,21 +8,21 @@
   "backend": "Pillow 11.3.0 + Mathtext 3.10.6",
   "theme_sha256": "f0fc07b8901f3dff1c7c1d3333006eb6288ec0c5d1b8f6f9af7c51c60b0b0674",
   "fonts": {
-    "regular": "/System/Library/Fonts/STHeiti Light.ttc",
-    "bold": "/System/Library/Fonts/STHeiti Medium.ttc",
-    "regular_sha256": "a57b0316cc0544f682b8fb9855e14ade79ae77340ef6a01ba9210e25b4c5a5b7",
-    "bold_sha256": "f8fa4a63e2cf500e98e64d4c73260daaba049306cf85dec9e3729bc285b7d645"
+    "regular": "/private/tmp/crash-card-pingfang-sc/Regular.ttf",
+    "bold": "/private/tmp/crash-card-pingfang-sc/Semibold.ttf",
+    "regular_sha256": "79fc60ed4da3468256528f73a6e12b2a31c7fde7a9e1a78dab9f89288fe460fc",
+    "bold_sha256": "9a2fc5d6775d2a0248d41ebc406a32cc8ba588860c79835cd8ca8d6af4cbf9fc"
   },
   "cards": [
     {
-      "id": "ex-structure",
+      "id": "my-ex-01",
       "type": "explanation",
-      "path": "explanation/ex-structure.png",
-      "png_sha256": "97ebafa93ec3f16a3db08585d1861240eaf3cecd03b3ac9ff19e7ceb552892de",
+      "path": "explanation/my-ex-01.png",
+      "png_sha256": "f8628139ee758e1327fb4ffe0779b93d07fb6243b69565ba32eeac85daa73f9f",
       "width": 1200,
       "height": 1600,
       "content_top": 336,
-      "content_bottom": 1282,
+      "content_bottom": 1410,
       "blocks": [
         {
           "id": "shared",
@@ -31,7 +31,7 @@
             72,
             336,
             1056,
-            134
+            201
           ]
         },
         {
@@ -39,135 +39,104 @@
           "kind": "table",
           "box": [
             72,
-            498,
+            565,
             1056,
-            408
+            564
           ]
         },
         {
-          "id": "leaf-meaning",
-          "kind": "paragraph",
-          "box": [
-            72,
-            934,
-            1056,
-            134
-          ]
-        },
-        {
-          "id": "range-difference",
+          "id": "meaning",
           "kind": "callout",
           "box": [
             72,
-            1096,
+            1157,
             1056,
-            186
+            253
           ]
         }
       ],
       "block_ids": [
         "shared",
         "compare",
-        "leaf-meaning",
-        "range-difference"
+        "meaning"
       ]
     },
     {
-      "id": "ex-range",
+      "id": "my-ex-02",
       "type": "explanation",
-      "path": "explanation/ex-range.png",
-      "png_sha256": "9fcf825acddc321092a8c3a80db3fcc8e2b88790642e5bcf296c2f288778153f",
+      "path": "explanation/my-ex-02.png",
+      "png_sha256": "1b605ee71983f3474f73e93c270de4b6376796758a8418531aec7fea6f5c9e6b",
       "width": 1200,
       "height": 1600,
       "content_top": 336,
-      "content_bottom": 1372,
+      "content_bottom": 1395,
       "blocks": [
         {
-          "id": "tree",
-          "kind": "flow",
+          "id": "fanout",
+          "kind": "paragraph",
           "box": [
             72,
             336,
-            1056,
-            369
-          ]
-        },
-        {
-          "id": "links",
-          "kind": "paragraph",
-          "box": [
-            72,
-            733,
-            1056,
-            134
-          ]
-        },
-        {
-          "id": "trace",
-          "kind": "paragraph",
-          "box": [
-            72,
-            895,
             1056,
             263
           ]
         },
         {
-          "id": "mechanism",
+          "id": "height",
+          "kind": "paragraph",
+          "box": [
+            72,
+            627,
+            1056,
+            263
+          ]
+        },
+        {
+          "id": "range",
+          "kind": "paragraph",
+          "box": [
+            72,
+            918,
+            1056,
+            263
+          ]
+        },
+        {
+          "id": "limit",
           "kind": "callout",
           "box": [
             72,
-            1186,
+            1209,
             1056,
             186
           ]
         }
       ],
       "block_ids": [
-        "tree",
-        "links",
-        "trace",
-        "mechanism"
+        "fanout",
+        "height",
+        "range",
+        "limit"
       ]
     },
     {
-      "id": "sc-range",
+      "id": "my-sc-01",
       "type": "self_check",
-      "path": "self-check/sc-range.png",
-      "png_sha256": "6c5289b0a9b17ab67432da42564a67efab90a202513008f444d942dfa36f1e10",
+      "path": "self-check/my-sc-01.png",
+      "png_sha256": "e1d3a23852213fe2cd64ad3e5f4613639243f0796b46180d00f4f7aec38a57f9",
       "width": 1200,
       "height": 1600,
       "content_top": 336,
-      "content_bottom": 1372,
+      "content_bottom": 880,
       "blocks": [
-        {
-          "id": "given-tree",
-          "kind": "flow",
-          "box": [
-            72,
-            336,
-            1056,
-            369
-          ]
-        },
-        {
-          "id": "given-links",
-          "kind": "paragraph",
-          "box": [
-            72,
-            733,
-            1056,
-            134
-          ]
-        },
         {
           "id": "__prompt",
           "kind": "callout",
           "box": [
             72,
-            895,
+            336,
             1056,
-            315
+            382
           ]
         },
         {
@@ -175,45 +144,43 @@
           "kind": "paragraph",
           "box": [
             72,
-            1238,
+            746,
             1056,
             134
           ]
         }
       ],
       "block_ids": [
-        "given-tree",
-        "given-links",
         "__prompt",
         "__instruction"
       ]
     },
     {
-      "id": "an-range",
+      "id": "my-an-01",
       "type": "answer",
-      "path": "answer/an-range.png",
-      "png_sha256": "6c75770be00b36271a4c6c5a125d0f8f93a7c867807605e2ded8d901fcf87ded",
+      "path": "answer/my-an-01.png",
+      "png_sha256": "c14e15113a14077749b81171300f03fbe30ab6095c85fbe4ab8cb8f0e07bb007",
       "width": 1200,
       "height": 1600,
       "content_top": 336,
-      "content_bottom": 1272,
+      "content_bottom": 1437,
       "blocks": [
         {
-          "id": "result",
-          "kind": "callout",
+          "id": "structure",
+          "kind": "paragraph",
           "box": [
             72,
             336,
             1056,
-            181
+            263
           ]
         },
         {
-          "id": "reason",
+          "id": "cause",
           "kind": "paragraph",
           "box": [
             72,
-            545,
+            627,
             1056,
             263
           ]
@@ -223,7 +190,7 @@
           "kind": "paragraph",
           "box": [
             72,
-            836,
+            918,
             1056,
             196
           ]
@@ -233,16 +200,331 @@
           "kind": "bullets",
           "box": [
             72,
-            1060,
+            1142,
             1056,
-            212
+            295
           ]
         }
       ],
       "block_ids": [
-        "result",
-        "reason",
+        "structure",
+        "cause",
         "boundary",
+        "@criteria"
+      ]
+    },
+    {
+      "id": "my-ex-03",
+      "type": "explanation",
+      "path": "explanation/my-ex-03.png",
+      "png_sha256": "fe5e8388dbaa66c41b32a880139443b03621b5ad18549cf54f4ed22f51a94afd",
+      "width": 1200,
+      "height": 1600,
+      "content_top": 336,
+      "content_bottom": 1413,
+      "blocks": [
+        {
+          "id": "context",
+          "kind": "paragraph",
+          "box": [
+            72,
+            336,
+            1056,
+            134
+          ]
+        },
+        {
+          "id": "scan",
+          "kind": "flow",
+          "box": [
+            72,
+            498,
+            1056,
+            768
+          ]
+        },
+        {
+          "id": "boundary",
+          "kind": "callout",
+          "box": [
+            72,
+            1294,
+            1056,
+            119
+          ]
+        }
+      ],
+      "block_ids": [
+        "context",
+        "scan",
+        "boundary"
+      ]
+    },
+    {
+      "id": "my-sc-02",
+      "type": "self_check",
+      "path": "self-check/my-sc-02.png",
+      "png_sha256": "821e87a3f00c5b66de32822c5b1a48d5017aa4a6567b1872b9adbc8440942c59",
+      "width": 1200,
+      "height": 1600,
+      "content_top": 336,
+      "content_bottom": 1291,
+      "blocks": [
+        {
+          "id": "given",
+          "kind": "paragraph",
+          "box": [
+            72,
+            336,
+            1056,
+            134
+          ]
+        },
+        {
+          "id": "pages",
+          "kind": "table",
+          "box": [
+            72,
+            498,
+            1056,
+            288
+          ]
+        },
+        {
+          "id": "__prompt",
+          "kind": "callout",
+          "box": [
+            72,
+            814,
+            1056,
+            315
+          ]
+        },
+        {
+          "id": "__instruction",
+          "kind": "paragraph",
+          "box": [
+            72,
+            1157,
+            1056,
+            134
+          ]
+        }
+      ],
+      "block_ids": [
+        "given",
+        "pages",
+        "__prompt",
+        "__instruction"
+      ]
+    },
+    {
+      "id": "my-an-02",
+      "type": "answer",
+      "path": "answer/my-an-02.png",
+      "png_sha256": "d5eda28feb687625ebea119126b05b9ac0af925003d8bca571c659f96c5b7cf9",
+      "width": 1200,
+      "height": 1600,
+      "content_top": 336,
+      "content_bottom": 1437,
+      "blocks": [
+        {
+          "id": "path",
+          "kind": "paragraph",
+          "box": [
+            72,
+            336,
+            1056,
+            263
+          ]
+        },
+        {
+          "id": "stop",
+          "kind": "paragraph",
+          "box": [
+            72,
+            627,
+            1056,
+            263
+          ]
+        },
+        {
+          "id": "limits",
+          "kind": "paragraph",
+          "box": [
+            72,
+            918,
+            1056,
+            196
+          ]
+        },
+        {
+          "id": "@criteria",
+          "kind": "bullets",
+          "box": [
+            72,
+            1142,
+            1056,
+            295
+          ]
+        }
+      ],
+      "block_ids": [
+        "path",
+        "stop",
+        "limits",
+        "@criteria"
+      ]
+    },
+    {
+      "id": "my-ex-04",
+      "type": "explanation",
+      "path": "explanation/my-ex-04.png",
+      "png_sha256": "ea4371c672daa1816c4fa378fc436e6a7a52d0da6b0e7eac007343b74eeacd69",
+      "width": 1200,
+      "height": 1600,
+      "content_top": 336,
+      "content_bottom": 1395,
+      "blocks": [
+        {
+          "id": "verdict",
+          "kind": "paragraph",
+          "box": [
+            72,
+            336,
+            1056,
+            263
+          ]
+        },
+        {
+          "id": "point",
+          "kind": "paragraph",
+          "box": [
+            72,
+            627,
+            1056,
+            263
+          ]
+        },
+        {
+          "id": "cost",
+          "kind": "paragraph",
+          "box": [
+            72,
+            918,
+            1056,
+            196
+          ]
+        },
+        {
+          "id": "rewrite",
+          "kind": "callout",
+          "box": [
+            72,
+            1142,
+            1056,
+            253
+          ]
+        }
+      ],
+      "block_ids": [
+        "verdict",
+        "point",
+        "cost",
+        "rewrite"
+      ]
+    },
+    {
+      "id": "my-sc-03",
+      "type": "self_check",
+      "path": "self-check/my-sc-03.png",
+      "png_sha256": "05dc39e3515175cab31ea08d7a5466b891cc13602911b54a8d1c7df61d602e64",
+      "width": 1200,
+      "height": 1600,
+      "content_top": 336,
+      "content_bottom": 880,
+      "blocks": [
+        {
+          "id": "__prompt",
+          "kind": "callout",
+          "box": [
+            72,
+            336,
+            1056,
+            382
+          ]
+        },
+        {
+          "id": "__instruction",
+          "kind": "paragraph",
+          "box": [
+            72,
+            746,
+            1056,
+            134
+          ]
+        }
+      ],
+      "block_ids": [
+        "__prompt",
+        "__instruction"
+      ]
+    },
+    {
+      "id": "my-an-03",
+      "type": "answer",
+      "path": "answer/my-an-03.png",
+      "png_sha256": "5a5e440f27cd27d6856b4e276e9a5eeec6bb4e4b92168c6e84d6c694920be308",
+      "width": 1200,
+      "height": 1600,
+      "content_top": 336,
+      "content_bottom": 1370,
+      "blocks": [
+        {
+          "id": "point",
+          "kind": "paragraph",
+          "box": [
+            72,
+            336,
+            1056,
+            196
+          ]
+        },
+        {
+          "id": "io",
+          "kind": "paragraph",
+          "box": [
+            72,
+            560,
+            1056,
+            196
+          ]
+        },
+        {
+          "id": "rewrite",
+          "kind": "paragraph",
+          "box": [
+            72,
+            784,
+            1056,
+            263
+          ]
+        },
+        {
+          "id": "@criteria",
+          "kind": "bullets",
+          "box": [
+            72,
+            1075,
+            1056,
+            295
+          ]
+        }
+      ],
+      "block_ids": [
+        "point",
+        "io",
+        "rewrite",
         "@criteria"
       ]
     }
