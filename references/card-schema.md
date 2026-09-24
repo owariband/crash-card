@@ -7,7 +7,7 @@
 | 字段 | 内容 |
 |---|---|
 | `schema_version` | 数字 `2` |
-| `title` | 卡包名称 |
+| `title` | 卡包名称，同时作为卡面右上系列标签；宜简短、中性，过长时标签省略 |
 | `dimensions` | `{"width":1200,"height":1600}` |
 | `units` | 单元：`id`, `title`, `objective`, `scope`, `prerequisites` 字符串数组，`source_ids` |
 | `sources` | 来源：`id`, `title`, `url`，可选 `note` |
@@ -52,7 +52,7 @@
 
 ## 三类卡片
 
-所有卡有 `id`、`type`、`unit_id`、`layout`。可用 `title` 指定标题，`depth` 标为 `core` 或 `deep`；连续卡用 `page: {"index":1,"total":2}` 等显式标记。`layout` 是阅读结构，不改变题答数据来源。省略标题时，讲解使用单元标题，自查和解答使用题目标题。
+所有卡有 `id`、`type`、`unit_id`、`layout`。可用 `title` 指定标题，`depth` 标为 `core` 或 `deep`；连续卡用 `page: {"index":1,"total":2}` 等显式标记。无 page 或 total=1 时卡面页码留空；内部 ID 不显示在卡面。`layout` 是阅读结构，不改变题答数据来源。省略标题时，讲解使用单元标题，自查和解答使用题目标题。
 
 | `type` | 内容来源 | 额外字段 |
 |---|---|---|

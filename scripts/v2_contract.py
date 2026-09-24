@@ -359,11 +359,14 @@ def resolve_cards(data: dict) -> list[dict]:
         raise ValueError("\n".join(errors))
     units = {u["id"]: u for u in data["units"]}
     questions = {q["id"]: q for q in data["questions"]}
+    titles = {c["id"]: c.get("title", units[c["unit_id"]]["title"])
+              for c in data["cards"] if c["type"] == "explanation"}
     result = []
     for raw in data["cards"]:
         card = copy.deepcopy(raw)
         unit = units[card["unit_id"]]
         card["unit_title"] = unit["title"]
+        card["series_title"] = data["title"]
         card["objective"] = unit["objective"]
         card.setdefault("depth", "core")
         if card["type"] == "explanation":
@@ -371,6 +374,8 @@ def resolve_cards(data: dict) -> list[dict]:
         else:
             question = questions[card["question_id"]]
             card["explanation_ids"] = copy.deepcopy(question["explanation_ids"])
+            if card["type"] == "answer":
+                card["explanation_titles"] = list(dict.fromkeys(titles[cid] for cid in question["explanation_ids"]))
             card.setdefault("title", question["title"])
             if card["type"] == "self_check":
                 card["blocks"] = copy.deepcopy(question.get("context", [])) + [

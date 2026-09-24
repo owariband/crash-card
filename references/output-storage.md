@@ -30,3 +30,7 @@
 新主题或新一批制卡创建新目录。明确修改或重渲染同一批 v2 卡片时沿用该批次目录；保留原 `render-report.json`，由渲染器在成功出图后根据旧报告和 PNG 哈希清理已取消的卡片。预先不删除旧图；未知或被修改的旧图交由用户选择保留位置，不擅自清理。保留 `intro.md`、`learning-log.md` 和其他用户文件；`review.md` 会重新导出，真实作答记录按 workflow 存入 `learning-log.md`。无法确定原批次位置时先定位原产物或询问，不把任意已有目录当作当前批次。
 
 旧 manifest 继续使用 legacy 路径和原批次的 `quick-check/`、`explanation/`；升级到 v2 时，在同一所选根目录下新建批次，保留旧批次，避免新旧图混放。
+
+## 可选发布目录
+
+社交媒体素材在既有批次根目录下新增 `posts/`，原母版路径与校验文件保留。分期、命名、配文和重导规则统一见 [social-publishing.md](social-publishing.md)；普通制卡不创建该目录。

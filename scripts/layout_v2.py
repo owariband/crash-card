@@ -396,7 +396,7 @@ class Scene:
         return image
 
 
-TYPE_LABELS = {"explanation": "知识讲解", "self_check": "自查问题", "answer": "解答核对"}
+TYPE_LABELS = {"explanation": "讲解", "self_check": "自测", "answer": "解答"}
 LAYOUT_LABELS = {"concept": "概念", "formula": "公式", "process": "流程", "comparison": "对比",
                  "worked_example": "例题", "misconception": "辨析", "question": "独立解释", "answer": "核对依据"}
 
@@ -411,11 +411,12 @@ def plan_card(card, fonts, theme):
     x, width = t["margin"], t["width"] - 2 * t["margin"]
     scene.box(x, 64, 206, 54, t["accent_soft"], radius=12)
     scene.text(TYPE_LABELS[card["type"]], x + 18, 67, 180, 32, t["accent"], True)
-    serial = card["id"]
-    sw = fonts.width(serial, 26)
-    if sw > width - 250:
-        raise LayoutError("card id is too wide for the header")
-    scene.text(serial, t["width"] - x - sw, 78, sw + 2, 26, t["muted"])
+    # Reader-facing series name; internal IDs remain in files and references.
+    series = card.get("series_title", "")
+    if series:
+        sw = fonts.width(series, 26)
+        if sw <= width - 250:
+            scene.text(series, t["width"] - x - sw, 78, sw + 2, 26, t["muted"])
     y = 145
     y += scene.text(card["title"], x, y, width, t["title_size"], bold=True, line_height=1.2, max_lines=2)
     y += 16
@@ -439,14 +440,15 @@ def plan_card(card, fonts, theme):
         y += used + t["block_gap"]
     scene.line([(x, 1492), (x + width, 1492)], t["rule"], 2)
     footer = "用自己的话解释 · 答后核对" if card["type"] == "self_check" else "CRASH CARD"
-    if card["type"] == "answer" and card.get("explanation_ids"):
-        footer = "补学：" + " / ".join(card["explanation_ids"])
+    if card["type"] == "answer" and card.get("explanation_titles"):
+        footer = "回看：" + "、".join("《" + title + "》" for title in card["explanation_titles"])
         if fonts.width(footer, 26) > width - 260:
-            footer = "补学映射见 review.md"
+            footer = "回看本主题的讲解篇"
     scene.text(footer, x, 1510, width - 260, 26, t["muted"])
     page = card.get("page")
-    suffix = f"{page['index']} / {page['total']}" if page else "1200 × 1600"
-    sw = fonts.width(suffix, 26)
-    scene.text(suffix, t["width"] - x - sw, 1510, sw + 2, 26, t["muted"])
+    if page and page["total"] > 1:
+        suffix = f"{page['index']} / {page['total']}"
+        sw = fonts.width(suffix, 26)
+        scene.text(suffix, t["width"] - x - sw, 1510, sw + 2, 26, t["muted"])
     return scene, {"content_top": content_start, "content_bottom": y - t["block_gap"],
                    "blocks": scene.bounds, "block_ids": [b["id"] for b in card["blocks"]]}
