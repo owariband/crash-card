@@ -1,0 +1,106 @@
+{
+  "schema_version": 2,
+  "title": "B 树与 B+ 树：从结构到范围查询",
+  "questions": [
+    {
+      "id": "q-range",
+      "unit_id": "u-range",
+      "title": "换个区间，你会怎么查？",
+      "prompt": "查询 22 ≤ k ≤ 55：从根开始，说明访问哪些叶子、返回哪些键，以及在哪里停止、为什么。",
+      "explanation_ids": [
+        "ex-structure",
+        "ex-range"
+      ],
+      "context": [
+        {
+          "id": "given-tree",
+          "kind": "flow",
+          "nodes": [
+            {
+              "id": "root",
+              "label": "根：30 | 50"
+            },
+            {
+              "id": "p1",
+              "label": "P1",
+              "text": "10, 20"
+            },
+            {
+              "id": "p2",
+              "label": "P2",
+              "text": "30, 40"
+            },
+            {
+              "id": "p3",
+              "label": "P3",
+              "text": "50, 60"
+            }
+          ],
+          "edges": [
+            {
+              "from": "root",
+              "to": "p1",
+              "label": "<30"
+            },
+            {
+              "from": "root",
+              "to": "p2",
+              "label": "30–49"
+            },
+            {
+              "from": "root",
+              "to": "p3",
+              "label": "≥50"
+            }
+          ]
+        },
+        {
+          "id": "given-links",
+          "kind": "paragraph",
+          "text": "键为互异整数；有序叶层：P1 → P2 → P3。箭头表示相邻叶子的链接，区间含两端。"
+        }
+      ],
+      "solution": {
+        "blocks": [
+          {
+            "id": "result",
+            "kind": "callout",
+            "heading": "结果：30、40、50",
+            "text": "访问路径：根 → P1 → P2 → P3。"
+          },
+          {
+            "id": "reason",
+            "kind": "paragraph",
+            "heading": "为什么这样走",
+            "text": "22 < 30，先到 P1；10、20 都小于下界。沿叶层到 P2，返回 30、40，再到 P3 返回 50。遇到 60 > 55 就停止：后续键更大，也不符合区间。"
+          },
+          {
+            "id": "boundary",
+            "kind": "paragraph",
+            "heading": "结构起了什么作用",
+            "text": "根只负责路由；定位后利用叶层的有序链接继续扫描，无需为每个结果重新从根查找。"
+          }
+        ],
+        "criteria": [
+          {
+            "id": "start",
+            "text": "说明先到 P1，再沿叶层向后查。",
+            "required": true
+          },
+          {
+            "id": "result-stop",
+            "text": "结果为 30、40、50；用有序性解释停止。",
+            "required": true
+          }
+        ],
+        "critical_errors": [
+          "认为下界 22 不存在就没有结果。",
+          "直接把内部节点的分隔键当作返回记录。"
+        ],
+        "accepted_variants": [
+          "可用箭头、逐步口述或等价的伪代码表达，不要求照抄答案。"
+        ]
+      }
+    }
+  ]
+}

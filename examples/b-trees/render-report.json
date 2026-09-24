@@ -1,0 +1,250 @@
+{
+  "schema_version": 2,
+  "manifest_sha256": "ec545dad5318e31322ad6e1a816aadb0f97e2ac22041084b1d51cd18e0c8bed0",
+  "dimensions": {
+    "width": 1200,
+    "height": 1600
+  },
+  "backend": "Pillow 11.3.0 + Mathtext 3.10.6",
+  "theme_sha256": "f0fc07b8901f3dff1c7c1d3333006eb6288ec0c5d1b8f6f9af7c51c60b0b0674",
+  "fonts": {
+    "regular": "/System/Library/Fonts/STHeiti Light.ttc",
+    "bold": "/System/Library/Fonts/STHeiti Medium.ttc",
+    "regular_sha256": "a57b0316cc0544f682b8fb9855e14ade79ae77340ef6a01ba9210e25b4c5a5b7",
+    "bold_sha256": "f8fa4a63e2cf500e98e64d4c73260daaba049306cf85dec9e3729bc285b7d645"
+  },
+  "cards": [
+    {
+      "id": "ex-structure",
+      "type": "explanation",
+      "path": "explanation/ex-structure.png",
+      "png_sha256": "ba2063dfa3db4b00626c5f5e4f4f60e276bd54fedfbf0e6793c6ba94ec0fe34e",
+      "width": 1200,
+      "height": 1600,
+      "content_top": 336,
+      "content_bottom": 1282,
+      "blocks": [
+        {
+          "id": "shared",
+          "kind": "paragraph",
+          "box": [
+            72,
+            336,
+            1056,
+            134
+          ]
+        },
+        {
+          "id": "compare",
+          "kind": "table",
+          "box": [
+            72,
+            498,
+            1056,
+            408
+          ]
+        },
+        {
+          "id": "leaf-meaning",
+          "kind": "paragraph",
+          "box": [
+            72,
+            934,
+            1056,
+            134
+          ]
+        },
+        {
+          "id": "range-difference",
+          "kind": "callout",
+          "box": [
+            72,
+            1096,
+            1056,
+            186
+          ]
+        }
+      ],
+      "block_ids": [
+        "shared",
+        "compare",
+        "leaf-meaning",
+        "range-difference"
+      ]
+    },
+    {
+      "id": "ex-range",
+      "type": "explanation",
+      "path": "explanation/ex-range.png",
+      "png_sha256": "3e6e9f845c72679f4f35bbaf39cfe80279c44a2e2dac111bb7aeb13a54e26e8e",
+      "width": 1200,
+      "height": 1600,
+      "content_top": 336,
+      "content_bottom": 1372,
+      "blocks": [
+        {
+          "id": "tree",
+          "kind": "flow",
+          "box": [
+            72,
+            336,
+            1056,
+            369
+          ]
+        },
+        {
+          "id": "links",
+          "kind": "paragraph",
+          "box": [
+            72,
+            733,
+            1056,
+            134
+          ]
+        },
+        {
+          "id": "trace",
+          "kind": "paragraph",
+          "box": [
+            72,
+            895,
+            1056,
+            263
+          ]
+        },
+        {
+          "id": "mechanism",
+          "kind": "callout",
+          "box": [
+            72,
+            1186,
+            1056,
+            186
+          ]
+        }
+      ],
+      "block_ids": [
+        "tree",
+        "links",
+        "trace",
+        "mechanism"
+      ]
+    },
+    {
+      "id": "sc-range",
+      "type": "self_check",
+      "path": "self-check/sc-range.png",
+      "png_sha256": "e7c56999e10414dbbb2b5f6b819956fee725955c46e13b8c7a7ba190f04190ee",
+      "width": 1200,
+      "height": 1600,
+      "content_top": 336,
+      "content_bottom": 1372,
+      "blocks": [
+        {
+          "id": "given-tree",
+          "kind": "flow",
+          "box": [
+            72,
+            336,
+            1056,
+            369
+          ]
+        },
+        {
+          "id": "given-links",
+          "kind": "paragraph",
+          "box": [
+            72,
+            733,
+            1056,
+            134
+          ]
+        },
+        {
+          "id": "__prompt",
+          "kind": "callout",
+          "box": [
+            72,
+            895,
+            1056,
+            315
+          ]
+        },
+        {
+          "id": "__instruction",
+          "kind": "paragraph",
+          "box": [
+            72,
+            1238,
+            1056,
+            134
+          ]
+        }
+      ],
+      "block_ids": [
+        "given-tree",
+        "given-links",
+        "__prompt",
+        "__instruction"
+      ]
+    },
+    {
+      "id": "an-range",
+      "type": "answer",
+      "path": "answer/an-range.png",
+      "png_sha256": "229c9938d7fd78e30cd1913b92218d32bea0450c85bf4a24005882e7694541f6",
+      "width": 1200,
+      "height": 1600,
+      "content_top": 336,
+      "content_bottom": 1272,
+      "blocks": [
+        {
+          "id": "result",
+          "kind": "callout",
+          "box": [
+            72,
+            336,
+            1056,
+            181
+          ]
+        },
+        {
+          "id": "reason",
+          "kind": "paragraph",
+          "box": [
+            72,
+            545,
+            1056,
+            263
+          ]
+        },
+        {
+          "id": "boundary",
+          "kind": "paragraph",
+          "box": [
+            72,
+            836,
+            1056,
+            196
+          ]
+        },
+        {
+          "id": "@criteria",
+          "kind": "bullets",
+          "box": [
+            72,
+            1060,
+            1056,
+            212
+          ]
+        }
+      ],
+      "block_ids": [
+        "result",
+        "reason",
+        "boundary",
+        "@criteria"
+      ]
+    }
+  ]
+}

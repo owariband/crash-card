@@ -1,0 +1,280 @@
+{
+  "schema_version": 2,
+  "title": "B 树与 B+ 树：从结构到范围查询",
+  "dimensions": {
+    "width": 1200,
+    "height": 1600
+  },
+  "units": [
+    {
+      "id": "u-range",
+      "title": "B 树与 B+ 树",
+      "objective": "区分两种树的数据位置，并根据 B+ 树的路由规则与叶层链接解释范围查询的起点、结果和停止条件。",
+      "scope": "教材中的经典 B 树与带有序叶层链接的 B+ 树；键为互异整数，区间含两端。示意树根分隔键为 30、50，相等时走右侧分支。不讨论插入删除、并发控制或特定数据库实现。",
+      "prerequisites": [
+        "知道键是用于查找和排序的值。",
+        "知道根、内部节点与叶子节点的区别。"
+      ],
+      "source_ids": [
+        "opendsa",
+        "cmu"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "opendsa",
+      "title": "Virginia Tech OpenDSA — B-Trees / B+ Trees",
+      "url": "https://opendsa-server.cs.vt.edu/ODSA/Books/CS3/html/BTree.html",
+      "note": "依据：经典 B 树的查找、B+ 树内部节点与叶子的分工、有序叶层与范围扫描。示例数值和题目为本项目原创。"
+    },
+    {
+      "id": "cmu",
+      "title": "CMU 15-445/645, Fall 2024 — Lecture 08: Indexes & Filters I",
+      "url": "https://15445.courses.cs.cmu.edu/fall2024/notes/08-indexes1.pdf",
+      "note": "依据：第 1–2 页的平衡性质、B 树与 B+ 树数据位置区别、内部节点路由以及叶子存记录或记录定位信息。"
+    }
+  ],
+  "questions": [
+    {
+      "id": "q-range",
+      "unit_id": "u-range",
+      "title": "换个区间，你会怎么查？",
+      "prompt": "查询 22 ≤ k ≤ 55：从根开始，说明访问哪些叶子、返回哪些键，以及在哪里停止、为什么。",
+      "explanation_ids": [
+        "ex-structure",
+        "ex-range"
+      ],
+      "context": [
+        {
+          "id": "given-tree",
+          "kind": "flow",
+          "nodes": [
+            {
+              "id": "root",
+              "label": "根：30 | 50"
+            },
+            {
+              "id": "p1",
+              "label": "P1",
+              "text": "10, 20"
+            },
+            {
+              "id": "p2",
+              "label": "P2",
+              "text": "30, 40"
+            },
+            {
+              "id": "p3",
+              "label": "P3",
+              "text": "50, 60"
+            }
+          ],
+          "edges": [
+            {
+              "from": "root",
+              "to": "p1",
+              "label": "<30"
+            },
+            {
+              "from": "root",
+              "to": "p2",
+              "label": "30–49"
+            },
+            {
+              "from": "root",
+              "to": "p3",
+              "label": "≥50"
+            }
+          ]
+        },
+        {
+          "id": "given-links",
+          "kind": "paragraph",
+          "text": "键为互异整数；有序叶层：P1 → P2 → P3。箭头表示相邻叶子的链接，区间含两端。"
+        }
+      ],
+      "solution": {
+        "blocks": [
+          {
+            "id": "result",
+            "kind": "callout",
+            "heading": "结果：30、40、50",
+            "text": "访问路径：根 → P1 → P2 → P3。"
+          },
+          {
+            "id": "reason",
+            "kind": "paragraph",
+            "heading": "为什么这样走",
+            "text": "22 < 30，先到 P1；10、20 都小于下界。沿叶层到 P2，返回 30、40，再到 P3 返回 50。遇到 60 > 55 就停止：后续键更大，也不符合区间。"
+          },
+          {
+            "id": "boundary",
+            "kind": "paragraph",
+            "heading": "结构起了什么作用",
+            "text": "根只负责路由；定位后利用叶层的有序链接继续扫描，无需为每个结果重新从根查找。"
+          }
+        ],
+        "criteria": [
+          {
+            "id": "start",
+            "text": "说明先到 P1，再沿叶层向后查。",
+            "required": true
+          },
+          {
+            "id": "result-stop",
+            "text": "结果为 30、40、50；用有序性解释停止。",
+            "required": true
+          }
+        ],
+        "critical_errors": [
+          "认为下界 22 不存在就没有结果。",
+          "直接把内部节点的分隔键当作返回记录。"
+        ],
+        "accepted_variants": [
+          "可用箭头、逐步口述或等价的伪代码表达，不要求照抄答案。"
+        ]
+      }
+    }
+  ],
+  "cards": [
+    {
+      "id": "ex-structure",
+      "type": "explanation",
+      "unit_id": "u-range",
+      "layout": "comparison",
+      "title": "B 树与 B+ 树",
+      "blocks": [
+        {
+          "id": "shared",
+          "kind": "paragraph",
+          "text": "两者都是平衡多路搜索树：一个节点可有多个分支，所有叶子处在同一层。"
+        },
+        {
+          "id": "compare",
+          "kind": "table",
+          "headers": [
+            "对比",
+            "经典 B 树",
+            "B+ 树"
+          ],
+          "widths": [
+            2,
+            3.5,
+            3.5
+          ],
+          "rows": [
+            [
+              "数据位置",
+              "内部节点和叶子都可保存数据",
+              "数据集中在叶子，内部节点负责路由"
+            ],
+            [
+              "查找终点",
+              "可在内部节点找到数据",
+              "沿分支找到叶子，再取数据"
+            ]
+          ]
+        },
+        {
+          "id": "leaf-meaning",
+          "kind": "paragraph",
+          "text": "这里的“数据”可以是记录本身，也可以是记录的位置；叶子不一定存整行。"
+        },
+        {
+          "id": "range-difference",
+          "kind": "callout",
+          "text": "B+ 树通常把叶子有序链接，方便范围扫描。B 树也能做范围查询。"
+        }
+      ]
+    },
+    {
+      "id": "ex-range",
+      "type": "explanation",
+      "unit_id": "u-range",
+      "layout": "worked_example",
+      "title": "范围查询怎样走？",
+      "blocks": [
+        {
+          "id": "tree",
+          "kind": "flow",
+          "nodes": [
+            {
+              "id": "root",
+              "label": "根：30 | 50"
+            },
+            {
+              "id": "p1",
+              "label": "P1",
+              "text": "10, 20"
+            },
+            {
+              "id": "p2",
+              "label": "P2",
+              "text": "30, 40"
+            },
+            {
+              "id": "p3",
+              "label": "P3",
+              "text": "50, 60"
+            }
+          ],
+          "edges": [
+            {
+              "from": "root",
+              "to": "p1",
+              "label": "<30"
+            },
+            {
+              "from": "root",
+              "to": "p2",
+              "label": "30–49"
+            },
+            {
+              "from": "root",
+              "to": "p3",
+              "label": "≥50"
+            }
+          ]
+        },
+        {
+          "id": "links",
+          "kind": "paragraph",
+          "text": "键为互异整数；有序叶层：P1 → P2 → P3。叶子间箭头表示相邻链接。"
+        },
+        {
+          "id": "trace",
+          "kind": "paragraph",
+          "heading": "查询 15 ≤ k ≤ 45",
+          "text": "先按下界 15 从根到 P1，跳过 10，返回 20；沿叶层到 P2，返回 30、40；再到 P3，遇到 50 > 45 停止。"
+        },
+        {
+          "id": "mechanism",
+          "kind": "callout",
+          "text": "先定位下界，再沿有序叶层扫描；第一个超过上界的键就是停止信号。"
+        }
+      ]
+    },
+    {
+      "id": "sc-range",
+      "type": "self_check",
+      "unit_id": "u-range",
+      "layout": "question",
+      "question_id": "q-range"
+    },
+    {
+      "id": "an-range",
+      "type": "answer",
+      "unit_id": "u-range",
+      "layout": "answer",
+      "title": "从下界走到停止条件",
+      "question_id": "q-range",
+      "solution_refs": [
+        "result",
+        "reason",
+        "boundary",
+        "@criteria"
+      ]
+    }
+  ]
+}
